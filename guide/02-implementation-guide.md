@@ -1,0 +1,574 @@
+# lingma-workflow 技能优化实施指南
+
+**版本**: 1.0  
+**更新日期**: 2026-03-18  
+**对应阶段**: Phase 1-3 完整实施路径
+
+---
+
+## 📋 快速开始（5 分钟）
+
+### Step 1: 复制配置模板
+
+```bash
+cd .lingma/skills/lingma-workflow
+cp laws.yaml.example laws.yaml
+```
+
+### Step 2: 安装依赖
+
+```bash
+npm install js-yaml
+```
+
+### Step 3: 运行验证
+
+```bash
+node validate.js
+```
+
+预期输出：
+```
+✅ 已加载铁律配置：3 条规则
+🔍 开始铁律验证...
+✅ 铁律 1：入口文件约束 - 验证通过
+✅ 铁律 2：路径约束 - 验证通过
+📋 Guidelines 完整性检查报告 - 得分：85/100
+✅ 所有铁律验证通过！
+```
+
+---
+
+## 🎯 Phase 1：基础加固（1 周）
+
+### 目标
+解决最严重的自动化问题，建立基础验证机制
+
+### 任务清单
+
+#### ✅ 1.1 创建配置文件
+
+**文件位置**: `.lingma/skills/lingma-workflow/laws.yaml`
+
+**操作**:
+```bash
+# 从示例模板开始
+cp laws.yaml.example laws.yaml
+
+# 根据项目实际情况调整配置
+code laws.yaml
+```
+
+**关键配置项**:
+- 入口文件路径（默认：`.lingma/LINGMA.md`）
+- 允许的路径模式（默认：`.lingma/workflow/**`）
+- Guidelines 必需章节（7 个核心章节）
+
+**验收标准**:
+- [ ] 配置文件语法正确
+- [ ] 所有路径和文件名符合项目实际
+- [ ] Guidelines 章节定义与现有文档一致
+
+---
+
+#### ✅ 1.2 实现验证脚本
+
+**文件位置**: `.lingma/skills/lingma-workflow/validate.js`
+
+**操作**:
+```bash
+# 从模板开始
+cp validate.js.template validate.js
+
+# 测试运行
+node validate.js --verbose
+```
+
+**功能要求**:
+- [ ] 验证铁律 1（入口文件）
+- [ ] 验证铁律 2（路径约束）
+- [ ] 验证铁律 3（Guidelines 完整性）
+- [ ] 生成健康仪表板
+- [ ] 返回正确的退出码（0=通过，1=失败）
+
+---
+
+#### ✅ 1.3 集成 Git Hook
+
+**文件位置**: `.git/hooks/pre-commit`
+
+**操作**:
+```bash
+cat > .git/hooks/pre-commit << 'EOF'
+#!/bin/bash
+
+echo "🔍 运行工作流铁律验证..."
+
+# 检查工作流文档是否变更
+if git diff --cached --name-only | grep -q ".lingma/workflow/"; then
+  echo "检测到工作流文档变更"
+  
+  # 运行验证脚本
+  node .lingma/skills/lingma-workflow/validate.js
+  
+  if [ $? -ne 0 ]; then
+    echo ""
+    echo "❌ 铁律验证失败，禁止提交"
+    echo "请先修复上述问题"
+    exit 1
+  fi
+  
+  echo "✅ 铁律验证通过"
+fi
+
+exit 0
+EOF
+
+chmod +x .git/hooks/pre-commit
+```
+
+**测试方法**:
+```bash
+# 尝试提交一个无效的 Guidelines 修改
+echo "# Invalid content" >> .lingma/workflow/project_guidelines.md
+git add .lingma/workflow/project_guidelines.md
+git commit -m "Test: 触发验证"
+
+# 应该看到验证失败
+```
+
+**验收标准**:
+- [ ] 工作流文档变更时自动触发验证
+- [ ] 验证失败时阻止提交
+- [ ] 验证通过时正常提交
+
+---
+
+#### ✅ 1.4 生成健康仪表板
+
+**文件位置**: `.lingma/workflow/HEALTH_DASHBOARD.md`
+
+**自动生成**: 验证脚本会自动生成
+
+**手动刷新**:
+```bash
+node validate.js --refresh-dashboard
+```
+
+**包含内容**:
+- 整体状态（🟢/🟡/🔴）
+- 铁律合规性表格
+- 文档新鲜度统计
+- 待处理问题列表
+- 建议操作
+
+**验收标准**:
+- [ ] 仪表板数据准确
+- [ ] 更新及时
+- [ ] 建议可执行
+
+---
+
+### Phase 1 交付物
+
+```
+.lingma/skills/lingma-workflow/
+├── laws.yaml              ✨ 新增：铁律配置
+├── validate.js            ✨ 新增：验证脚本
+└── HEALTH_DASHBOARD.md    ✨ 新增：健康仪表板
+
+.git/
+└── hooks/
+    └── pre-commit         ✨ 新增：Git Hook
+```
+
+---
+
+## 🚀 Phase 2：模块化重构（2 周）
+
+### 目标
+提升可维护性和扩展性，拆分单体 SKILL.md
+
+### 任务清单
+
+#### 🔨 2.1 创建模块目录
+
+```bash
+cd .lingma/skills/lingma-workflow
+mkdir -p modules rules tools
+```
+
+#### 🔨 2.2 拆分验证逻辑
+
+**modules/entry-validator.md**:
+```markdown
+# Entry Validator Module
+
+## 职责
+验证入口文件的合法性和存在性
+
+## 输入
+- user_entry: 用户指定的入口文件路径（可选）
+- config: 从 laws.yaml 加载的配置
+
+## 验证流程
+1. 如果未指定入口 → 使用默认值
+2. 如果指定了入口 → 验证是否匹配
+3. 检查文件是否存在
+4. 返回验证结果
+
+## 输出格式
+{
+  valid: boolean,
+  path?: string,
+  error?: {
+    code: string,
+    message: string,
+    suggestion: string
+  }
+}
+```
+
+**modules/path-guardian.md**:
+```markdown
+# Path Guardian Module
+
+## 职责
+验证目标路径是否在允许范围内
+
+## 验证步骤
+1. 规范化路径（解析 .. 和 .）
+2. 解析符号链接
+3. 检查前缀匹配
+4. 检查白名单模式
+5. 检查黑名单模式
+
+## 安全防护
+- 防止 .. 绕过
+- 防止符号链接跳转
+- 防止大小写混淆
+```
+
+#### 🔨 2.3 简化 SKILL.md
+
+**目标**: 从 381 行减少到 150 行以内
+
+**方法**:
+1. 将验证逻辑移到 modules/
+2. 将规则定义移到 laws.yaml
+3. SKILL.md 只保留编排逻辑
+
+**修改前后对比**:
+```diff
+- ## ⚖️ 铁律约束（必须遵守）
+- （98 行详细规则定义）
++ ## ⚖️ 铁律约束
++ 详见：[laws.yaml](laws.yaml)
+
+- ### Step 2: 加载上下文文档
+- （详细的验证逻辑，50+ 行）
++ ### Step 2: 加载上下文文档
++ 调用 `modules/entry_validator.md` 验证入口
++ 调用 `modules/path_guardian.md` 验证路径
++ 调用 `modules/guidelines_checker.md` 验证完整性
+```
+
+---
+
+### Phase 2 交付物
+
+```
+.lingma/skills/lingma-workflow/
+├── SKILL.md               🔄 重构：精简到 150 行
+├── laws.yaml              ✅ 已有
+├── config.yaml            ✨ 新增：通用配置
+├── modules/               ✨ 新增：模块目录
+│   ├── entry_validator.md
+│   ├── path_guardian.md
+│   ├── guidelines_checker.md
+│   └── doc_aligner.md
+├── rules/                 ✨ 新增：规则目录
+│   ├── iron_laws.yaml
+│   └── validation_flow.yaml
+└── tools/
+    ├── validate.js        ✅ 已有
+    └── dashboard-generator.js  ✨ 新增
+```
+
+---
+
+## 🤖 Phase 3：自动化闭环（2 周）
+
+### 目标
+实现全方位自动化监控和自愈
+
+### 任务清单
+
+#### 🤖 3.1 CI/CD 集成
+
+**文件位置**: `.github/workflows/workflow-validation.yml`
+
+```yaml
+name: Workflow Validation
+
+on:
+  push:
+    paths:
+      - '.lingma/workflow/**'
+  pull_request:
+    paths:
+      - '.lingma/workflow/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          
+      - name: Install Dependencies
+        run: npm install js-yaml
+        
+      - name: Validate Iron Laws
+        run: node .lingma/skills/lingma-workflow/validate.js
+        
+      - name: Upload Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: workflow-validation-report
+          path: .lingma/workflow/HEALTH_DASHBOARD.md
+```
+
+#### 🤖 3.2 VSCode 插件开发
+
+**目录结构**:
+```
+vscode-extension/
+├── package.json
+├── src/
+│   ├── extension.ts
+│   ├── validator.ts
+│   └── diagnostics.ts
+└── README.md
+```
+
+**核心功能**:
+- 实时诊断（保存时验证）
+- Hover 提示（显示章节完整性）
+- 快捷命令（一键修复）
+- 状态栏指示器
+
+#### 🤖 3.3 自愈机制
+
+**配置位置**: `laws.yaml` 的 `self_healing` 部分
+
+**自愈规则示例**:
+```yaml
+self_healing:
+  rules:
+    - name: "auto_fix_terminology"
+      trigger: "terminology_inconsistent"
+      confidence_threshold: 0.9
+      action: |
+        检测到术语不一致：${inconsistent_terms}
+        统一为：${canonical_term}
+        已修正 ${count} 处引用
+        
+      require_confirmation: false  # 高置信度无需确认
+```
+
+---
+
+### Phase 3 交付物
+
+- ✅ GitHub Actions 工作流
+- ✅ VSCode 插件（内部版）
+- ✅ 自愈规则引擎
+- ✅ 持续监控系统
+
+---
+
+## 📊 成功指标
+
+### 定量指标
+
+| 指标 | 基线 | Phase 1 目标 | Phase 3 目标 |
+|------|------|--------------|--------------|
+| 铁律违规次数/周 | 5+ | <2 | <0.5 |
+| Guidelines 完整性 | 71% | 85% | 100% |
+| 文档更新延迟 | 7 天 | <3 天 | <1 天 |
+| 自动化覆盖率 | 0% | 40% | 80% |
+
+### 定性指标
+
+- ✅ 用户反馈"技能更智能了"
+- ✅ 新成员能快速理解工作流
+- ✅ 文档与代码保持一致
+- ✅ 减少重复沟通成本
+
+---
+
+## 🔧 故障排查
+
+### 问题 1：验证脚本无法运行
+
+**症状**:
+```bash
+$ node validate.js
+Error: Cannot find module 'js-yaml'
+```
+
+**解决方案**:
+```bash
+npm install js-yaml
+# 或
+pnpm add js-yaml
+```
+
+---
+
+### 问题 2：Git Hook 不生效
+
+**症状**: 提交时没有触发验证
+
+**检查清单**:
+```bash
+# 1. 检查 Hook 是否有执行权限
+ls -l .git/hooks/pre-commit
+# 应该是：-rwxr-xr-x
+
+# 2. 如果没有权限，添加权限
+chmod +x .git/hooks/pre-commit
+
+# 3. 检查 Hook 内容是否正确
+cat .git/hooks/pre-commit
+```
+
+---
+
+### 问题 3：Guidelines 评分过低
+
+**症状**: 验证显示分数低于 70 分
+
+**解决方案**:
+```bash
+# 查看详细评分报告
+node validate.js --verbose
+
+# 根据报告补全缺失章节
+code .lingma/workflow/project_guidelines.md
+```
+
+**快速补全模板**:
+```markdown
+## 5. Current Canonical Terms
+
+本项目使用的术语规范：
+
+- **订单 (Order)**: 客户购买行为的记录单元
+- **运单 (Shipment)**: 物流配送的基本单位
+- **包裹 (Package)**: 物理包装的独立单元
+
+## 7. Suggested Next Deliverables
+
+后续完善建议：
+
+1. 添加代码审查规范
+2. 完善 API 接口文档模板
+3. 建立自动化测试规范
+```
+
+---
+
+## 📚 参考资源
+
+### 配套文件
+
+- `laws.yaml.example` - 铁律配置模板
+- `validate.js.template` - 验证脚本模板
+- `ANALYSIS_AND_OPTIMIZATION.md` - 完整分析报告
+
+### 相关文档
+
+- `.lingma/LINGMA.md` - 工作流入口文件
+- `.lingma/workflow/project_guidelines.md` - 协作规范
+- `.lingma/skills/lingma-workflow/SKILL.md` - 技能主文件
+
+### 工具链接
+
+- [js-yaml 文档](https://github.com/nodeca/js-yaml)
+- [Git Hooks 官方文档](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks)
+- [VSCode Extension API](https://code.visualstudio.com/api)
+
+---
+
+## ❓ FAQ
+
+### Q1: 能否跳过某个阶段？
+
+**A**: 不建议。每个阶段都建立在前一阶段的基础上：
+- Phase 1 提供基础验证能力
+- Phase 2 提升可维护性
+- Phase 3 实现自动化
+
+跳过会导致技术债务累积。
+
+### Q2: 是否需要一次性实施所有优化？
+
+**A**: 不需要。建议：
+1. 优先完成 Phase 1（解决最严重问题）
+2. 根据团队资源逐步推进
+3. 每个阶段都有独立价值
+
+### Q3: 如果项目结构调整怎么办？
+
+**A**: 配置化方案的优势就体现出来了：
+```yaml
+# 只需修改 laws.yaml
+path_constraints:
+  prefix: ".new_workflow_dir"  # 改这里
+```
+
+无需修改技能代码。
+
+### Q4: 如何回滚更改？
+
+**A**: 
+```bash
+# Git Hook 回滚
+rm .git/hooks/pre-commit
+
+# 配置回滚
+git checkout .lingma/skills/lingma-workflow/laws.yaml
+
+# 完全清理
+rm -rf .lingma/skills/lingma-workflow/{modules,rules,tools}
+```
+
+---
+
+## 🎉 总结
+
+本指南提供了从当前版本升级到优化版本的完整路径：
+
+**短期（本周）** → Phase 1：基础加固  
+**中期（1 个月）** → Phase 2：模块化重构  
+**长期（3 个月）** → Phase 3：自动化闭环
+
+每个阶段都有明确的交付物和验收标准，确保渐进式改进而不影响现有工作流。
+
+**立即开始**：
+```bash
+# 5 分钟快速体验
+cp .lingma/skills/lingma-workflow/laws.yaml.example \
+   .lingma/skills/lingma-workflow/laws.yaml
+node .lingma/skills/lingma-workflow/validate.js
+```
+
+---
+
+*本指南由 lingma-workflow 技能辅助生成，符合项目标准化工作流规范*

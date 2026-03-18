@@ -1,0 +1,569 @@
+# 铁律定义文件
+# 版本：1.0
+# 更新日期：2026-03-18
+
+version: "1.0"
+last_updated: "2026-03-18"
+author: "lingma-workflow-skill"
+
+# ============================================
+# 铁律 1：入口文件约束
+# ============================================
+iron_laws:
+  - id: "LAW_001"
+    name: "入口文件约束"
+    name_en: "Entry File Constraint"
+    description: "入口文件只能是 .lingma/LINGMA.md"
+    severity: "CRITICAL"  # CRITICAL | HIGH | MEDIUM | LOW
+    
+    # 验证条件
+    condition:
+      type: "path_equality"  # 路径相等检查
+      field: "entry_file"
+      value: ".lingma/LINGMA.md"
+      case_sensitive: true
+      allow_tilde_expansion: false
+      
+    # 违规处理
+    on_violation:
+      action: "reject"  # reject | warn | info
+      block_execution: true
+      message_template: |
+        ⛔ **违反铁律 1：入口文件验证失败**
+        
+        根据 lingma-workflow 技能的强制约束：
+        - 入口文件只能是 `.lingma/LINGMA.md`
+        - {violation_detail}
+        
+        请修正为：
+        ```bash
+        /lingma-workflow --entry .lingma/LINGMA.md
+        
+        # 或直接使用（默认入口）
+        /lingma-workflow
+        ```
+        
+      variables:
+        violation_detail: 
+          - key: "expected_value"
+            value: ".lingma/LINGMA.md"
+          - key: "actual_value"
+            value: "${user_provided_entry}"
+            
+      suggestions:
+        - "使用默认入口文件（不指定 --entry 参数）"
+        - "显式指定正确的入口文件路径"
+        - "检查工作区根目录是否正确"
+        
+    # 例外情况（几乎没有）
+    exceptions: []
+    
+    # 测试用例
+    test_cases:
+      - name: "默认入口测试"
+        input: null
+        expected: "pass"
+        
+      - name: "正确入口测试"
+        input: ".lingma/LINGMA.md"
+        expected: "pass"
+        
+      - name: "错误入口测试"
+        input: "src/workflow/entry.md"
+        expected: "fail"
+        error_contains: "入口文件必须是"
+        
+      - name: "大小写敏感测试"
+        input: ".lingma/lingma.md"
+        expected: "fail"
+        
+      - name: "不存在文件测试"
+        input: ".lingma/NON_EXISTENT.md"
+        expected: "fail"
+        error_contains: "入口文件不存在"
+
+  # ============================================
+  # 铁律 2：路径约束
+  # ============================================
+  - id: "LAW_002"
+    name: "路径约束"
+    name_en: "Path Constraint"
+    description: "工作流生成的路径必须在工作空间根目录下的 .lingma/workflow 内"
+    severity: "CRITICAL"
+    
+    # 验证条件
+    condition:
+      type: "path_prefix"  # 路径前缀检查
+      field: "target_path"
+      prefix: ".lingma/workflow"
+      
+      # 高级选项
+      options:
+        normalize_path: true  # 解析 .. 和 .
+        resolve_symlinks: true  # 解析符号链接
+        case_insensitive: false
+        allow_trailing_slash: true
+        
+      # 允许的模式
+      allowed_patterns:
+        - "**/*.md"           # 只允许 Markdown 文件
+        - "**/*.yaml"         # 配置文件
+        - "**/*.yml"
+        - "**/subfolder/**"   # 允许子目录
+        
+      # 拒绝的模式
+      denied_patterns:
+        - "**/*.tmp"
+        - "**/*.bak"
+        - "**/node_modules/**"
+        - "**/.git/**"
+        - "**/dist/**"
+        - "**/*.js"           # 不允许直接生成代码
+        - "**/*.ts"
+        
+    # 验证逻辑（伪代码）
+    validation_logic: |
+      FUNCTION validate_path(target_path):
+        # 步骤 1：规范化路径
+        normalized = path.normalize(target_path)
+        resolved = path.resolve(normalized)
+        
+        # 步骤 2：检查前缀
+        IF NOT resolved.starts_with(".lingma/workflow"):
+          RETURN FAIL("路径超出范围")
+          
+        # 步骤 3：检查允许模式
+        IF NOT matches_any(resolved, allowed_patterns):
+          RETURN FAIL("文件类型不被允许")
+          
+        # 步骤 4：检查拒绝模式
+        IF matches_any(resolved, denied_patterns):
+          RETURN FAIL("路径在黑名单中")
+          
+        RETURN PASS()
+      END FUNCTION
+      
+    # 违规处理
+    on_violation:
+      action: "reject"
+      block_execution: true
+      message_template: |
+        ⛔ **违反铁律 2：路径约束验证失败**
+        
+        根据 lingma-workflow 技能的强制约束：
+        - 工作流生成的路径必须在工作空间根目录下的 `.lingma/workflow` 内
+        - 您指定的路径：`${actual_path}`
+        
+        **建议位置**：
+        ```markdown
+        ✅ 推荐：
+        .lingma/workflow/${filename}
+        
+        ✅ 也可接受：
+        .lingma/workflow/subfolder/${filename}
+        
+        ❌ 禁止：
+        src/workflow/${filename}
+        docs/workflow/${filename}
+        ```
+        
+        是否需要我在正确的位置创建？
+        
+      auto_fix:
+        enabled: true
+        strategy: "suggest_correct_path"
+        template: ".lingma/workflow/${filename}"
+        
+    # 测试用例
+    test_cases:
+      - name: "标准路径测试"
+        input: ".lingma/workflow/test.md"
+        expected: "pass"
+        
+      - name: "子目录路径测试"
+        input: ".lingma/workflow/guidelines/test.md"
+        expected: "pass"
+        
+      - name: "越界路径测试"
+        input: "src/workflow/test.md"
+        expected: "fail"
+        
+      - name: "路径绕过攻击测试"
+        input: ".lingma/workflow/../src/test.md"
+        expected: "fail"
+        note: "必须检测 .. 绕过"
+        
+      - name: "绝对路径测试"
+        input: "/home/user/project/.lingma/workflow/test.md"
+        expected: "pass"
+        note: "如果在项目根目录下则通过"
+
+  # ============================================
+  # 铁律 3：Guidelines 完整性
+  # ============================================
+  - id: "LAW_003"
+    name: "Guidelines 完整性"
+    name_en: "Guidelines Completeness"
+    description: "project_guidelines.md 必须包含 7 个核心章节"
+    severity: "CRITICAL"
+    
+    # 验证条件
+    condition:
+      type: "document_structure"
+      file: ".lingma/workflow/project_guidelines.md"
+      
+      # 必需章节定义
+      required_sections:
+        - id: 1
+          name: "Role"
+          name_cn: "角色定义"
+          pattern: "^##\\s*1\\.\\s*(Role|角色)"
+          min_length: 50  # 最少字符数
+          min_items: 3    # 最少列表项数
+          keywords:       # 必须包含的关键词
+            - "技术协作者"
+            - "交付"
+          must_not_contain:
+            - "聊天助手"
+            - "随意"
+            
+        - id: 2
+          name: "What Lingma Should Prefer"
+          name_cn: "优先事项"
+          pattern: "^##\\s*2\\.\\s*.*Prefer"
+          min_items: 1
+          items_format: "list_item"  # 必须是列表格式
+          
+        - id: 3
+          name: "What Lingma Should Avoid"
+          name_cn: "避免事项"
+          pattern: "^##\\s*3\\.\\s*.*Avoid"
+          min_items: 1
+          
+        - id: 4
+          name: "Response Rules"
+          name_cn: "响应规则"
+          pattern: "^##\\s*4\\.\\s*Response Rules"
+          min_length: 20
+          
+        - id: 5
+          name: "Current Canonical Terms"
+          name_cn: "术语规范"
+          pattern: "^##\\s*5\\.\\s*Current Canonical Terms"
+          allow_empty: true  # 允许暂时为空，但会警告
+          warning_if_empty: true
+          
+        - id: 6
+          name: "Deliverable Standard"
+          name_cn: "交付标准"
+          pattern: "^##\\s*6\\.\\s*Deliverable Standard"
+          min_items: 3
+          keywords:
+            - "直接使用"
+            - "一致"
+            - "阶段"
+            
+        - id: 7
+          name: "Suggested Next Deliverables"
+          name_cn: "完善建议"
+          pattern: "^##\\s*7\\.\\s*Suggested Next"
+          allow_empty: true
+          
+      # 整体要求
+      overall_requirements:
+        min_total_length: 500  # 文档总长度至少 500 字符
+        max_empty_chapters: 2  # 最多允许 2 个空章节
+        must_have_examples: false  # 不强制要求示例
+        
+    # 评分系统
+    scoring:
+      total_score: 100
+      chapter_weights:
+        chapter_1: 20  # 角色定义最重要
+        chapter_2: 15
+        chapter_3: 15
+        chapter_4: 15
+        chapter_5: 10
+        chapter_6: 15
+        chapter_7: 10
+        
+      pass_threshold: 70  # 70 分及格
+      warning_threshold: 85  # 85 分以上无警告
+      
+    # 违规处理
+    on_violation:
+      action: "warn_and_suggest"  # 警告但不阻止
+      block_execution: false
+      
+      # 根据严重程度决定行为
+      severity_handling:
+        if_score_below_50:
+          action: "reject"
+          message: "❌ Guidelines 完整性严重不足（得分：${score}），请先补全核心章节"
+          
+        if_score_50_to_70:
+          action: "warn_strongly"
+          message: "⚠️ Guidelines 完整性不足（得分：${score}），建议先补全缺失内容"
+          
+        if_score_above_70:
+          action: "info"
+          message: "ℹ️ Guidelines 基本完整（得分：${score}），但可以继续优化"
+          
+      detailed_report_template: |
+        📋 **铁律 3：Guidelines 完整性检查报告**
+        
+        ## 总体评分：${total_score}/100
+        
+        ## 章节详情
+        | 章节 | 状态 | 得分 | 备注 |
+        |------|------|------|------|
+        ${chapter_details}
+        
+        ## 发现问题
+        ${issues_list}
+        
+        ## 建议操作
+        1. ${top_priority_fix}
+        2. ${secondary_fix}
+        
+        ## 快速修复
+        需要我帮您自动补全缺失的章节吗？
+        - [ ] 是，请补全所有空章节
+        - [ ] 否，我自己处理
+        
+      auto_complete_template: |
+        我可以为您补全以下章节：
+        
+        ### ${chapter_name}
+        
+        ${suggested_content}
+        
+        是否添加到文档中？
+
+    # 测试用例
+    test_cases:
+      - name: "完整 Guidelines 测试"
+        setup: "创建包含全部 7 章的文档"
+        expected_score: 95
+        expected: "pass"
+        
+      - name: "缺少第 5 章测试"
+        setup: "第 5 章只有标题无内容"
+        expected_score: 85
+        expected: "pass_with_warning"
+        
+      - name: "缺少多个章节测试"
+        setup: "缺少第 2、3、6 章"
+        expected_score: 45
+        expected: "fail"
+
+# ============================================
+# 监控配置
+# ============================================
+monitoring:
+  # 持续监听模式
+  continuous_monitoring:
+    enabled: true
+    
+    # 触发重新验证的事件
+    triggers:
+      - type: "user_request_change"
+        patterns:
+          - "*在*创建*"
+          - "*保存到*"
+          - "*生成到*"
+          - "*换个地方*"
+          - "*改到*"
+        action: "re_validate_path"
+        
+      - type: "entry_change_request"
+        patterns:
+          - "*用*代替*"
+          - "*不用*用*"
+          - "*换入口*"
+        action: "reject_and_remind_law_1"
+        
+      - type: "guidelines_modification"
+        patterns:
+          - "*修改规范*"
+          - "*更新 guidelines*"
+          - "*添加规则*"
+        action: "check_completeness_first"
+        
+  # 变更通知
+  change_notification:
+    enabled: true
+    notify_on:
+      - "law_violated"
+      - "guidelines_modified"
+      - "path_attempt_outside"
+    template: |
+      📢 **工作流监控通知**
+      
+      检测到可能违反铁律的操作：
+      - 时间：${timestamp}
+      - 用户：${user_id}
+      - 操作：${operation}
+      - 涉及铁律：${law_id}
+      
+      已采取的措施：${action_taken}
+
+# ============================================
+# 冲突检测配置
+# ============================================
+conflict_detection:
+  enabled: true
+  
+  # 检测的冲突类型
+  types:
+    - name: "terminology_conflict"
+      description: "术语不一致"
+      severity: "warning"
+      example: "订单 vs Order 混用"
+      
+    - name: "process_conflict"
+      description: "流程矛盾"
+      severity: "critical"
+      example: "文档 A 说先 X 后 Y，文档 B 说先 Y 后 X"
+      
+    - name: "stage_conflict"
+      description: "阶段信息冲突"
+      severity: "critical"
+      example: "文档 A 说 M1，文档 B 说 M2"
+      
+  # 解决策略
+  resolution:
+    priority_order:
+      - ".lingma/LINGMA.md"              # 最高优先级
+      - ".lingma/workflow/project_guidelines.md"
+      - ".lingma/workflow/WORKFLOW.md"
+      - ".lingma/workflow/task_breakdown.md"
+      
+    on_conflict_detected:
+      action: "report_and_ask"
+      template: |
+        ⚠️ **检测到文档冲突**
+        
+        **冲突类型**: ${conflict_type}
+        **严重程度**: ${severity}
+        
+        **冲突详情**:
+        - 📄 ${doc1_name}: "${content1}"
+        - 📄 ${doc2_name}: "${content2}"
+        
+        **建议方案**:
+        根据优先级规则，我将采用：**${priority_doc}**
+        
+        **可选操作**:
+        - [ ] 采纳建议，以 ${priority_doc} 为准
+        - [ ] 手动指定采用哪个文档
+        - [ ] 暂不处理，记录冲突
+        
+        请选择如何处理？
+
+# ============================================
+# 自愈规则配置
+# ============================================
+self_healing:
+  enabled: true
+  
+  rules:
+    - name: "auto_fix_terminology"
+      description: "自动统一术语"
+      trigger: "terminology_inconsistent"
+      confidence_threshold: 0.9  # 置信度高于 90% 才自动修复
+      
+      action: |
+        检测到术语不一致：${inconsistent_terms}
+        根据 ${source_doc}，统一为：${canonical_term}
+        已修正 ${count} 处引用
+        
+      require_confirmation: false  # 高置信度无需确认
+      
+    - name: "auto_add_cross_reference"
+      description: "自动添加交叉引用"
+      trigger: "missing_cross_reference"
+      confidence_threshold: 0.8
+      
+      action: |
+        检测到 ${doc_name} 缺少对 ${referenced_doc} 的引用
+        已在 ${section} 章节添加引用
+        
+      require_confirmation: false
+      
+    - name: "sync_stage_info"
+      description: "同步阶段信息"
+      trigger: "stage_mismatch"
+      confidence_threshold: 0.7
+      
+      action: |
+        ⚠️ 检测到多个文档的阶段信息不一致
+        
+        当前阶段应为：**${current_stage}**
+        
+        发现以下不一致：
+        ${mismatch_details}
+        
+        建议批量更新所有文档的阶段信息。
+        
+      require_confirmation: true  # 需要人工确认
+
+# ============================================
+# 性能优化配置
+# ============================================
+performance:
+  # 缓存策略
+  caching:
+    enabled: true
+    ttl_seconds: 300  # 5 分钟有效期
+    
+    cache_keys:
+      - "laws_validation_result"
+      - "guidelines_completeness_score"
+      - "document_structure"
+      
+    invalidate_on:
+      - "file_modified"
+      - "manual_trigger"
+      
+  # 增量验证
+  incremental_validation:
+    enabled: true
+    track_changes: true
+    
+    # 只验证变更部分
+    validate_only_changed:
+      - "content_modified"
+      - "structure_changed"
+      
+    full_validation_interval: 3600  # 每小时一次完整验证
+
+# ============================================
+# 报告与统计配置
+# ============================================
+reporting:
+  # 健康仪表板
+  health_dashboard:
+    enabled: true
+    auto_generate: true
+    output_file: ".lingma/workflow/HEALTH_DASHBOARD.md"
+    update_frequency: "on_change"  # 每次变更后更新
+    
+    sections:
+      - "overall_status"
+      - "law_compliance"
+      - "document_freshness"
+      - "pending_issues"
+      - "suggested_actions"
+      
+  # 定期报告
+  periodic_reports:
+    enabled: true
+    frequency: "weekly"  # 每周生成一次
+    recipients: ["project_team"]
+    
+    content:
+      - "violations_summary"
+      - "compliance_trend"
+      - "top_issues"
+      - "recommendations"

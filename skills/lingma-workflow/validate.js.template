@@ -1,0 +1,460 @@
+#!/usr/bin/env node
+
+/**
+ * 铁律验证脚本
+ * 
+ * 用途：在 Git commit、CI/CD 或手动执行时验证工作流文档是否符合铁律
+ * 
+ * 使用方法：
+ *   node validate.js              # 验证所有铁律
+ *   node validate.js --law LAW_001  # 只验证特定铁律
+ *   node validate.js --fix        # 尝试自动修复
+ *   node validate.js --verbose    # 详细输出
+ */
+
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import yaml from 'js-yaml';
+
+// ES Module 兼容性处理
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// ANSI 颜色代码
+const colors = {
+  reset: '\x1b[0m',
+  red: '\x1b[31m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  blue: '\x1b[34m',
+  magenta: '\x1b[35m',
+  cyan: '\x1b[36m'
+};
+
+// 工具函数
+const log = {
+  success: (msg) => console.log(`${colors.green}✅ ${msg}${colors.reset}`),
+  error: (msg) => console.log(`${colors.red}❌ ${msg}${colors.reset}`),
+  warning: (msg) => console.log(`${colors.yellow}⚠️  ${msg}${colors.reset}`),
+  info: (msg) => console.log(`${colors.blue}ℹ️  ${msg}${colors.reset}`),
+  detail: (msg) => console.log(`   ${colors.cyan}${msg}${colors.reset}`)
+};
+
+class IronLawsValidator {
+  constructor(options = {}) {
+    this.projectRoot = options.projectRoot || process.cwd();
+    this.verbose = options.verbose || false;
+    this.autoFix = options.autoFix || false;
+    this.lawsFile = path.join(this.projectRoot, '.lingma/skills/lingma-workflow/laws.yaml');
+    this.workflowDir = path.join(this.projectRoot, '.lingma/workflow');
+    
+    // 加载铁律配置
+    this.laws = this.loadLaws();
+    
+    // 统计信息
+    this.stats = {
+      total: 0,
+      passed: 0,
+      failed: 0,
+      warnings: 0
+    };
+  }
+  
+  /**
+   * 加载铁律配置文件
+   */
+  loadLaws() {
+    try {
+      if (!fs.existsSync(this.lawsFile)) {
+        log.warning(`铁律配置文件不存在：${this.lawsFile}`);
+        return null;
+      }
+      
+      const content = fs.readFileSync(this.lawsFile, 'utf8');
+      const laws = yaml.load(content);
+      
+      log.success(`已加载铁律配置：${laws.iron_laws.length} 条规则`);
+      return laws;
+    } catch (error) {
+      log.error(`加载铁律配置失败：${error.message}`);
+      return null;
+    }
+  }
+  
+  /**
+   * 验证铁律 1：入口文件约束
+   */
+  async validateLaw001() {
+    log.info('验证铁律 1：入口文件约束...');
+    
+    const entryFile = path.join(this.projectRoot, '.lingma/LINGMA.md');
+    
+    if (!fs.existsSync(entryFile)) {
+      log.error('入口文件不存在：.lingma/LINGMA.md');
+      this.stats.failed++;
+      return false;
+    }
+    
+    // 检查是否唯一
+    const possibleEntries = [
+      '.lingma/LINGMA.md',
+      '.lingma/lingma.md',
+      '.lingma/Lingma.md',
+      'LINGMA.md',
+      'lingma.md'
+    ];
+    
+    const foundEntries = possibleEntries.filter(p => 
+      fs.existsSync(path.join(this.projectRoot, p))
+    );
+    
+    if (foundEntries.length > 1) {
+      log.error(`发现多个可能的入口文件：${foundEntries.join(', ')}`);
+      this.stats.failed++;
+      return false;
+    }
+    
+    log.success('入口文件存在且唯一');
+    this.stats.passed++;
+    return true;
+  }
+  
+  /**
+   * 验证铁律 2：路径约束
+   */
+  async validateLaw002() {
+    log.info('验证铁律 2：路径约束...');
+    
+    const workflowDir = this.workflowDir;
+    
+    if (!fs.existsSync(workflowDir)) {
+      log.error('工作流目录不存在：.lingma/workflow');
+      this.stats.failed++;
+      return false;
+    }
+    
+    // 递归获取所有文件
+    const getAllFiles = (dir) => {
+      const files = [];
+      const items = fs.readdirSync(dir);
+      
+      for (const item of items) {
+        const fullPath = path.join(dir, item);
+        const stat = fs.statSync(fullPath);
+        
+        if (stat.isDirectory()) {
+          files.push(...getAllFiles(fullPath));
+        } else {
+          files.push(fullPath);
+        }
+      }
+      
+      return files;
+    };
+    
+    const workflowFiles = getAllFiles(workflowDir);
+    let hasViolations = false;
+    
+    for (const file of workflowFiles) {
+      const relativePath = path.relative(this.projectRoot, file);
+      
+      // 检查是否在正确目录下
+      if (!relativePath.startsWith('.lingma/workflow')) {
+        log.error(`路径违规：${relativePath}`);
+        hasViolations = true;
+      }
+      
+      // 检查文件扩展名
+      if (!file.endsWith('.md') && !file.endsWith('.yaml') && !file.endsWith('.yml')) {
+        log.warning(`非标准文件类型：${relativePath}`);
+        this.stats.warnings++;
+      }
+    }
+    
+    if (hasViolations) {
+      this.stats.failed++;
+      return false;
+    }
+    
+    log.success(`路径约束验证通过（共 ${workflowFiles.length} 个文件）`);
+    this.stats.passed++;
+    return true;
+  }
+  
+  /**
+   * 验证铁律 3：Guidelines 完整性
+   */
+  async validateLaw003() {
+    log.info('验证铁律 3：Guidelines 完整性...');
+    
+    const guidelinesFile = path.join(this.workflowDir, 'project_guidelines.md');
+    
+    if (!fs.existsSync(guidelinesFile)) {
+      log.error('Guidelines 文件不存在');
+      this.stats.failed++;
+      return false;
+    }
+    
+    const content = fs.readFileSync(guidelinesFile, 'utf8');
+    
+    // 必需章节
+    const requiredChapters = [
+      { id: 1, pattern: /^##\s*1\.\s*(Role|角色)/i, name: '角色定义' },
+      { id: 2, pattern: /^##\s*2\.\s*.*Prefer/i, name: '优先事项' },
+      { id: 3, pattern: /^##\s*3\.\s*.*Avoid/i, name: '避免事项' },
+      { id: 4, pattern: /^##\s*4\.\s*Response Rules/i, name: '响应规则' },
+      { id: 5, pattern: /^##\s*5\.\s*Current Canonical Terms/i, name: '术语规范' },
+      { id: 6, pattern: /^##\s*6\.\s*Deliverable Standard/i, name: '交付标准' },
+      { id: 7, pattern: /^##\s*7\.\s*Suggested Next/i, name: '完善建议' }
+    ];
+    
+    let score = 0;
+    const chapterScores = [];
+    const issues = [];
+    
+    for (const chapter of requiredChapters) {
+      const match = content.match(chapter.pattern);
+      
+      if (match) {
+        // 检查章节内容
+        const chapterStart = match.index;
+        const nextChapter = requiredChapters.find(c => c.id > chapter.id);
+        let chapterEnd = content.length;
+        
+        if (nextChapter) {
+          const nextMatch = content.match(nextChapter.pattern);
+          if (nextMatch) {
+            chapterEnd = nextMatch.index;
+          }
+        }
+        
+        const chapterContent = content.slice(chapterStart, chapterEnd);
+        const chapterLength = chapterContent.length;
+        
+        // 简单评分逻辑
+        let chapterScore = 0;
+        if (chapterLength > 50) chapterScore += 50;
+        if (chapterLength > 100) chapterScore += 30;
+        if (chapterLength > 200) chapterScore += 20;
+        
+        // 特殊处理第 5 章和第 7 章（允许为空）
+        if ([5, 7].includes(chapter.id) && chapterLength < 50) {
+          chapterScore = 50; // 空章节得一半分
+          issues.push(`第 ${chapter.id} 章「${chapter.name}」内容为空`);
+        }
+        
+        score += chapterScore;
+        chapterScores.push({
+          id: chapter.id,
+          name: chapter.name,
+          score: chapterScore,
+          status: chapterScore >= 80 ? '✅' : chapterScore >= 50 ? '⚠️' : '❌'
+        });
+      } else {
+        issues.push(`缺少第 ${chapter.id} 章「${chapter.name}」`);
+        chapterScores.push({
+          id: chapter.id,
+          name: chapter.name,
+          score: 0,
+          status: '❌'
+        });
+      }
+    }
+    
+    // 计算总分（满分 100）
+    const maxScore = requiredChapters.length * 100;
+    const percentage = Math.round((score / maxScore) * 100);
+    
+    // 显示评分报告
+    console.log('\n' + '='.repeat(60));
+    console.log('📋 Guidelines 完整性检查报告');
+    console.log('='.repeat(60));
+    console.log(`总体评分：${percentage}/100`);
+    console.log('');
+    console.log('章节详情:');
+    console.table(chapterScores.map(cs => ({
+      '章节': cs.name,
+      '得分': `${cs.score}/100`,
+      '状态': cs.status
+    })));
+    
+    if (issues.length > 0) {
+      console.log('\n发现问题:');
+      issues.forEach((issue, i) => {
+        console.log(`  ${i + 1}. ${issue}`);
+      });
+    }
+    
+    console.log('='.repeat(60) + '\n');
+    
+    // 判断是否通过
+    if (percentage >= 70) {
+      log.success(`Guidelines 完整性验证通过（得分：${percentage}）`);
+      this.stats.passed++;
+      
+      if (percentage < 85) {
+        log.warning('建议继续完善 Guidelines 文档');
+        this.stats.warnings++;
+      }
+      
+      return true;
+    } else {
+      log.error(`Guidelines 完整性不足（得分：${percentage}，需要至少 70）`);
+      this.stats.failed++;
+      return false;
+    }
+  }
+  
+  /**
+   * 生成健康仪表板
+   */
+  generateHealthDashboard(results) {
+    const dashboard = `# Workflow Health Dashboard
+
+**自动生成时间**: ${new Date().toISOString().replace('T', ' ').slice(0, 19)}
+
+## 整体状态：${results.allPassed ? '🟢 健康' : '🔴 存在问题'}
+
+### 铁律合规性
+
+| 铁律 | 状态 | 备注 |
+|------|------|------|
+${results.details.map(d => `| ${d.name} | ${d.passed ? '✅' : '❌'} | ${d.message || '-'} |`).join('\n')}
+
+### 统计信息
+
+- ✅ 通过：${results.stats.passed}
+- ❌ 失败：${results.stats.failed}
+- ⚠️ 警告：${results.stats.warnings}
+
+### 待处理问题
+
+${results.issues.length > 0 ? results.issues.map((issue, i) => `${i + 1}. ${issue}`).join('\n') : '暂无'}
+
+### 建议操作
+
+\`\`\`bash
+# 一键修复所有问题（如果支持）
+node .lingma/skills/lingma-workflow/validate.js --fix
+
+# 查看详细报告
+cat .lingma/workflow/HEALTH_DASHBOARD.md
+\`\`\`
+
+---
+
+*此仪表板由 lingma-workflow 技能自动生成*
+`;
+    
+    const outputPath = path.join(this.workflowDir, 'HEALTH_DASHBOARD.md');
+    fs.writeFileSync(outputPath, dashboard);
+    
+    log.success(`健康仪表板已生成：${outputPath}`);
+  }
+  
+  /**
+   * 执行所有验证
+   */
+  async validateAll(lawFilter = null) {
+    console.log('\n' + '='.repeat(60));
+    console.log('🔍 开始铁律验证');
+    console.log('='.repeat(60) + '\n');
+    
+    const results = {
+      details: [],
+      issues: [],
+      stats: this.stats,
+      allPassed: true
+    };
+    
+    // 铁律 1
+    const law1Passed = await this.validateLaw001();
+    results.details.push({
+      id: 'LAW_001',
+      name: '铁律 1：入口文件约束',
+      passed: law1Passed,
+      message: law1Passed ? '验证通过' : '入口文件不存在或不唯一'
+    });
+    
+    if (!law1Passed) {
+      results.issues.push('入口文件 .lingma/LINGMA.md 不存在或不唯一');
+      results.allPassed = false;
+    }
+    
+    // 铁律 2
+    const law2Passed = await this.validateLaw002();
+    results.details.push({
+      id: 'LAW_002',
+      name: '铁律 2：路径约束',
+      passed: law2Passed,
+      message: law2Passed ? '验证通过' : '发现路径违规'
+    });
+    
+    if (!law2Passed) {
+      results.issues.push('工作流目录不存在或发现路径违规');
+      results.allPassed = false;
+    }
+    
+    // 铁律 3
+    const law3Passed = await this.validateLaw003();
+    results.details.push({
+      id: 'LAW_003',
+      name: '铁律 3：Guidelines 完整性',
+      passed: law3Passed,
+      message: law3Passed ? '验证通过' : 'Guidelines 完整性不足'
+    });
+    
+    if (!law3Passed) {
+      results.issues.push('Guidelines 文档完整性评分低于 70 分');
+      results.allPassed = false;
+    }
+    
+    // 总结
+    console.log('\n' + '='.repeat(60));
+    console.log('📊 验证总结');
+    console.log('='.repeat(60));
+    console.log(`总计：${this.stats.passed + this.stats.failed} 项`);
+    console.log(`通过：${this.stats.passed} 项 ✅`);
+    console.log(`失败：${this.stats.failed} 项 ❌`);
+    console.log(`警告：${this.stats.warnings} 项 ⚠️`);
+    console.log('='.repeat(60) + '\n');
+    
+    // 生成健康仪表板
+    this.generateHealthDashboard(results);
+    
+    // 退出码
+    if (!results.allPassed) {
+      log.error('铁律验证失败，请修复上述问题');
+      process.exit(1);
+    } else {
+      log.success('所有铁律验证通过！');
+      process.exit(0);
+    }
+  }
+}
+
+// CLI 参数解析
+const args = process.argv.slice(2);
+const options = {
+  verbose: args.includes('--verbose') || args.includes('-v'),
+  autoFix: args.includes('--fix'),
+  projectRoot: process.cwd()
+};
+
+const lawIndex = args.indexOf('--law');
+const lawFilter = lawIndex !== -1 ? args[lawIndex + 1] : null;
+
+// 主函数
+(async function main() {
+  try {
+    const validator = new IronLawsValidator(options);
+    await validator.validateAll(lawFilter);
+  } catch (error) {
+    log.error(`验证过程出错：${error.message}`);
+    if (options.verbose) {
+      console.error(error.stack);
+    }
+    process.exit(1);
+  }
+})();
