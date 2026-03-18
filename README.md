@@ -440,7 +440,7 @@ code .lingma/workflow/project_guidelines.md
 
 ```bash
 # 克隆项目
-git clone https://github.com/your-org/lingma-workflow.git
+git clone https://github.com/Kogisune/lingma-workflow.git
 
 # 安装依赖
 cd lingma-workflow
@@ -475,9 +475,9 @@ npm test
 
 ## 📞 联系方式
 
-- **项目主页**: https://github.com/lingma-workflow
-- **问题反馈**: https://github.com/lingma-workflow/issues
-- **讨论区**: https://github.com/lingma-workflow/discussions
+- **项目主页**: https://github.com/Kogisune/lingma-workflow
+- **问题反馈**: https://github.com/Kogisune/lingma-workflow/issues
+- **讨论区**: https://github.com/Kogisune/lingma-workflow/discussions
 
 ---
 
