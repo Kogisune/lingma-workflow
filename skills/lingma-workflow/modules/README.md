@@ -357,7 +357,8 @@ invalidate_on:
 - **指南中心**: [../../guide/README.md](../../guide/README.md) - 所有指南类文档
   - [01-entry-file-upgrade-guide.md](../../guide/01-entry-file-upgrade-guide.md) - 入口文件升级指南
   - [02-implementation-guide.md](../../guide/02-implementation-guide.md) - 实施指南
-  - [03-modular-refactor-report.md](../../guide/03-modular-refactor-report.md) - 模块化重构报告
+  - [05-modular-refactoring-guide.md](../../guide/05-modular-refactoring-guide.md) - 模块化重构指南
+  - [06-document-generator-guide.md](../../guide/06-document-generator-guide.md) - 文档生成器指南
 - **实施指南**: [../../guide/02-implementation-guide.md](../../guide/02-implementation-guide.md) - 分阶段实施步骤
 
 ---

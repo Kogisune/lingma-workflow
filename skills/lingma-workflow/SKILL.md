@@ -460,4 +460,4 @@ SWITCH result.type:
 - **指南中心**: `.lingma/guide/` - 所有指南类文档
   - [01-entry-file-upgrade-guide.md](../../guide/01-entry-file-upgrade-guide.md) - 入口文件升级指南
   - [02-implementation-guide.md](../../guide/02-implementation-guide.md) - 实施指南
-  - [03-modular-refactor-report.md](../../guide/03-modular-refactor-report.md) - 模块化重构报告
+  - [05-modular-refactoring-guide.md](../../guide/05-modular-refactoring-guide.md) - 模块化重构指南

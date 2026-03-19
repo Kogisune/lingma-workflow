@@ -1,243 +1,300 @@
-# Lingma Guide Center - 指南中心
+# 指南中心
 
-**用途**: 集中管理 `lingma-workflow` 技能的所有指南类文档
-
-**位置**: `.lingma/guide/`
+欢迎使用 `lingma-workflow` 指南系列！这些文档专注于描述技能内部的实际功能架构设计、具体实现细节、使用方案以及升级指导。
 
 ---
 
-## 📚 文档分类
+## 📖 文档定位
 
-本目录包含以下类型的指南文档：
+本目录下所有文件均为**标准指南格式**，包含：
+- ✅ 明确的目标和适用场景
+- ✅ 详细的实施步骤和代码示例
+- ✅ 最佳实践和经验总结
+- ✅ 完整的验收清单
+- ✅ FAQ 和相关资源链接
 
-### 1. 升级指南 (Upgrade Guides)
+> 💡 **注意**: 技术报告已整合到对应指南中，不再单独维护。
 
-记录技能的重要升级和变更说明。
+## 📚 指南列表
 
-- **[01-entry-file-upgrade-guide.md](./01-entry-file-upgrade-guide.md)** - 入口文件处理机制升级指南
-  - 版本：2.0
-  - 日期：2026-03-18
-  - 内容：从严格模式升级到智能自举模式的完整说明
+### 入门系列
 
-### 2. 实施指南 (Implementation Guides)
+#### [实施指南](02-implementation-guide.md) ⭐⭐⭐⭐⭐
 
-提供分阶段的实施步骤和操作指引。
+**难度**: 初级  
+**时间**: 5 分钟快速开始 + 1-4 周完整实施  
+**适合人群**: 所有用户
 
-- **[02-implementation-guide.md](./02-implementation-guide.md)** - lingma-workflow 技能优化实施指南
-  - 版本：1.0
-  - 日期：2026-03-18
-  - 内容：Phase 1-3 的详细任务清单和操作步骤
+**内容**:
+- ✅ 快速开始（5 分钟配置）
+- ✅ Phase 1: 基础加固（1 周）
+- ✅ Phase 2: 模块化重构（2 周）
+- ✅ Phase 3: 自动化闭环（2 周）
+- ✅ Phase 4: 文档生成器（2-3 周）
+- ✅ 故障排查和 FAQ
 
-### 3. 技术报告 (Technical Reports)
-
-记录技能架构优化和技术决策。
-
-- **[03-modular-refactor-report.md](./03-modular-refactor-report.md)** - 模块化重构报告
-  - 版本：1.0
-  - 日期：2026-03-18
-  - 内容：从单体结构到模块化架构的完整重构过程
-  
-- **[04-workflow-generator-report.md](./04-workflow-generator-report.md)** - 工作流生成器开发报告 🔥
-  - 版本：1.0
-  - 日期：2026-03-19
-  - 内容：通用文档生成系统的完整设计与实现
-
-### 4. 最佳实践 (Best Practices) 🔜
-
-总结使用技能和开发模块的最佳实践。
-
-- **[10-template-development-guide.md](./10-template-development-guide.md)** - 模板开发指南 🔥
-  - 版本：1.0
-  - 日期：2026-03-19
-  - 状态：已完成
-  - 内容：如何设计和开发可复用的文档模板
-
-### 5. 故障排查 (Troubleshooting) 🔜
-
-常见问题和解决方案集合。
-
-- 状态：规划中
+**阅读建议**: **首次使用必读**
 
 ---
 
-## 📋 文档编号规则
+#### [入口文件升级指南](01-entry-file-upgrade-guide.md) ⭐⭐⭐⭐
 
-所有文档采用统一的编号格式：
+**难度**: 中级  
+**时间**: 30 分钟  
+**适合人群**: 从 v1.0 升级到 v2.0 的用户
+
+**内容**:
+- ✅ 变更概述（严格模式 → 智能自举模式）
+- ✅ 智能检测逻辑详解
+- ✅ 自举流程说明
+- ✅ 效果对比和迁移指南
+
+**阅读建议**: 版本升级时参考
+
+---
+
+### 进阶系列
+
+#### [模块化重构指南](05-modular-refactoring-guide.md) ⭐⭐⭐⭐
+
+**难度**: 中级  
+**时间**: 2 周  
+**适合人群**: 希望优化代码结构的开发者
+
+**内容**:
+- ✅ 模块化设计原则
+- ✅ 实施步骤详解
+- ✅ 模块接口定义
+- ✅ 性能对比和最佳实践
+- ✅ 未来扩展方向
+
+**阅读建议**: 代码重构时参考
+
+---
+
+#### [文档生成器指南](06-document-generator-guide.md) ⭐⭐⭐⭐⭐
+
+**难度**: 高级  
+**时间**: 2-3 周  
+**适合人群**: 需要批量创建文档的团队
+
+**内容**:
+- ✅ 系统架构设计
+- ✅ 核心组件实现
+- ✅ 模板库建设
+- ✅ 配置管理
+- ✅ 质量检查机制
+- ✅ 实际项目验证
+
+**阅读建议**: 批量创建文档时参考
+
+---
+
+### 技术报告
+
+> 💡 **注意**: 技术报告已整合到对应指南中，不再单独维护。
+> 
+> - 模块化重构详情见 [模块化重构指南](05-modular-refactoring-guide.md)
+> - 文档生成器详情见 [文档生成器指南](06-document-generator-guide.md)
+
+---
+
+## 🎯 学习路径
+
+### 新手路线（第 1 周）
 
 ```
-NN-document-name.md
+Day 1: 阅读 [实施指南](02-implementation-guide.md) 的快速开始部分
+       ↓
+Day 2: 完成 Phase 1 基础加固
+       ↓
+Day 3-7: 逐步实施其他阶段
 ```
 
-其中：
-- `NN`: 两位数字编号（01, 02, 03...）
-- `document-name`: 小写字母和连字符组成的描述性名称
+### 进阶路线（第 2-4 周）
 
-### 编号分配
+```
+Week 2: 阅读 [模块化重构指南](05-modular-refactoring-guide.md)
+        ↓
+        实施模块化改造
+        
+Week 3-4: 阅读 [文档生成器指南](06-document-generator-guide.md)
+          ↓
+          搭建文档生成系统
+```
 
-| 编号范围 | 文档类型 | 示例 |
-|---------|---------|------|
-| 01-09 | 升级指南 | 01-entry-file-upgrade-guide.md |
-| 10-19 | 实施指南 | 10-phase2-implementation.md |
-| 20-29 | 技术报告 | 20-modular-refactor-report.md |
-| 30-39 | 最佳实践 | 30-module-development-best-practices.md |
-| 40-49 | 故障排查 | 40-common-issues-and-solutions.md |
+### 专家路线（深入研究）
 
----
-
-## 🔗 快速导航
-
-### 新用户必读
-
-1. **[02-implementation-guide.md](./02-implementation-guide.md)** - 从零开始实施工作流
-2. **[01-entry-file-upgrade-guide.md](./01-entry-file-upgrade-guide.md)** - 理解入口文件机制
-
-### 开发者参考
-
-1. **[03-modular-refactor-report.md](./03-modular-refactor-report.md)** - 了解架构设计思路
-2. **modules/README.md** - 模块开发规范
-
-### 维护人员参考
-
-1. 所有文档 + **laws.yaml.example** - 完整配置说明
+```
+1. 深入阅读所有指南
+   ↓
+2. 研究技能源码
+   ↓
+3. 根据实际需求定制和扩展
+```
 
 ---
 
-## 📂 相关目录
+## 📖 阅读顺序建议
 
-### 技能核心文件
+### 场景 1：首次使用
 
-位于 `.lingma/skills/lingma-workflow/`:
+```
+1. [实施指南](02-implementation-guide.md) - 快速开始
+2. [入口文件升级指南](01-entry-file-upgrade-guide.md) - 了解智能特性
+3. 开始实际使用
+```
 
-- `SKILL.md` - 主技能文件
-- `README.md` - 使用说明
-- `examples.md` - 示例文档
-- `modules/` - 模块化组件
+### 场景 2：代码重构
 
-### 工作流文档
+```
+1. [模块化重构指南](05-modular-refactoring-guide.md) - 核心原则
+2. 查看模块源码
+3. 开始重构实施
+```
 
-位于 `.lingma/workflow/`:
+### 场景 3：文档自动化
 
-- `LINGMA.md` - 项目工作流入口
-- `project_guidelines.md` - 协作规范
-- `WORKFLOW.md` - 执行流程
-- `task_breakdown.md` - 任务分解
+```
+1. [文档生成器指南](06-document-generator-guide.md) - 完整实现
+2. 开始搭建生成系统
+```
+
+### 场景 4：深入了解架构
+
+```
+1. [模块化重构指南](05-modular-refactoring-guide.md) - 实施步骤
+2. 查看技能模块代码
+3. 在实践中理解设计
+```
+
+---
+
+## 🔗 快速链接
+
+### 核心资源
+
+- **[主 README](../README.md)** - 项目概述和快速开始
+- **[技能说明](../skills/lingma-workflow/SKILL.md)** - 技能定义
+- **[模块文档](../skills/lingma-workflow/modules/README.md)** - 模块导航
+
+### 配置文件
+
+- **[laws.yaml.example](../skills/lingma-workflow/laws.yaml.example)** - 铁律配置模板
+- **[project-config.yaml.example](../skills/lingma-workflow/templates/config/project-config.yaml.example)** - 项目配置示例
 
 ### 工具脚本
 
-位于 `.lingma/skills/lingma-workflow/`:
-
-- `bootstrap-entry.js` - 入口文件自举脚本
-- `validate.js.template` - 验证脚本模板
-- `laws.yaml.example` - YAML 配置模板
+- **[validate.js](../skills/lingma-workflow/validate.js)** - 验证脚本
+- **[bootstrap-entry.js](../skills/lingma-workflow/bootstrap-entry.js)** - 自举脚本
 
 ---
 
-## 🎯 使用场景
+## 📊 指南统计
 
-### 场景 1：首次使用工作流
+| 指南 | 版本 | 难度 | 预计时间 | 状态 |
+|------|------|------|----------|------|
+| [实施指南](02-implementation-guide.md) | 2.1 | 初级 | 5 分钟 - 4 周 | ✅ 最新 |
+| [入口文件升级指南](01-entry-file-upgrade-guide.md) | 2.0 | 中级 | 30 分钟 | ✅ 稳定 |
+| [模块化重构指南](05-modular-refactoring-guide.md) | 2.1 | 中级 | 2 周 | ✅ 最新 |
+| [文档生成器指南](06-document-generator-guide.md) | 1.0 | 高级 | 2-3 周 | ✅ 新增 |
+
+### 改进现有指南
+
+如果发现指南中有错误或不清晰的地方：
+
+1. Fork 项目
+2. 创建分支 `docs/improve-guide-xxx`
+3. 修改指南内容
+4. 提交 Pull Request
+
+### 添加新指南
+
+如果你有新的主题想要分享：
+
+1. 在 Issues 中提出建议
+2. 说明指南的主题、目标和大纲
+3. 社区讨论和确认
+4. 编写并提交指南
+
+### 指南格式标准
+
+每个指南应包含：
 
 ```markdown
-阅读顺序:
-1. 02-implementation-guide.md (Phase 1)
-2. 按照步骤创建入口文件
-3. 运行验证脚本
-4. 开始使用工作流
-```
+# 指南标题
 
-### 场景 2：升级现有工作流
-
-```markdown
-阅读顺序:
-1. 01-entry-file-upgrade-guide.md
-2. 检查变更点
-3. 应用新的配置
-4. 测试验证
-```
-
-### 场景 3：开发新模块
-
-```markdown
-阅读顺序:
-1. 03-modular-refactor-report.md (了解架构)
-2. modules/README.md (模块规范)
-3. entry-file-handler.md (参考实现)
-4. 开始开发
-```
+**版本**: x.x  
+**更新日期**: YYYY-MM-DD  
+**难度**: 初级/中级/高级  
+**预计时间**: X 小时/天/周
 
 ---
 
-## 📊 文档状态总览
+## 📋 概述
 
-| 文档编号 | 文档名称 | 版本 | 状态 | 最后更新 |
-|---------|---------|------|------|----------|
-| 01 | Entry File Upgrade Guide | 2.0 | ✅ 完成 | 2026-03-18 |
-| 02 | Implementation Guide | 2.0 | ✅ 完成 | 2026-03-19 |
-| 03 | Modular Refactor Report | 1.0 | ✅ 完成 | 2026-03-18 |
-| 04 | Workflow Generator Report | 1.0 | ✅ 完成 | 2026-03-19 |
-| 10 | Template Development Guide | 1.0 | ✅ 完成 | 2026-03-19 |
-| 20+ | Technical Reports | - | 📋 规划 | - |
-| 30+ | Best Practices | - | 📋 规划 | - |
-| 40+ | Troubleshooting | - | 📋 规划 | - |
+简要说明指南的目标和适用场景
 
-**图例**:
-- ✅ 已完成并发布
-- 📋 规划中
-- 🔧 编写中
-- 🧪 审核中
+## 🎯 核心原则/设计原则
 
----
+指导思想和基本原则
+
+## 🛠️ 实施步骤
+
+详细的操作步骤和代码示例
+
+## 📦 交付成果
+
+预期的输出和成果
+
+## 🧪 测试验证
+
+如何验证实施效果
+
+## 📊 效果评估
+
+定量和定性的效果对比
 
 ## 🔮 未来规划
 
-### Phase 1: 基础文档（已完成）✅
-- [x] 01 - 入口文件升级指南 (2026-03-18)
-- [x] 02 - 实施指南 (2026-03-18)
-- [x] 03 - 模块化重构报告 (2026-03-18)
+后续发展方向
 
-### Phase 2: 扩展文档（已完成）✅
-- [x] 04 - 工作流生成器开发报告 (2026-03-19)
-- [x] 10 - 模板开发指南 (2026-03-19)
-- [ ] 20 - 性能优化报告（移至下一阶段）
+## 📚 相关资源
 
-### Phase 3: 完善文档（2026-Q3）📋
-- [ ] 40 - 常见问题解答
-- [ ] 41 - 故障排查手册
-- [ ] 21 - CI/CD集成指南
+相关的文档和外部资源
 
----
+## ❓ FAQ
 
-## 💡 贡献指南
+常见问题解答
 
-### 添加新文档
+## ✅ 验收清单
 
-1. 确定文档类型和编号范围
-2. 选择下一个可用编号
-3. 使用标准命名：`NN-document-name.md`
-4. 在本文档中更新索引
-
-### 更新现有文档
-
-1. 更新版本文档头部信息
-2. 在文档末尾添加变更日志
-3. 更新本文档的状态表格
-
-### 文档质量标准
-
-- ✅ 结构清晰，有明确的目录
-- ✅ 包含实际可用的示例
-- ✅ 提供完整的代码片段
-- ✅ 有相关的图表说明
-- ✅ 包含故障排查部分
-- ✅ 最后更新日期和版本
+自我检查清单
+```
 
 ---
 
-## 📞 维护信息
+## 📞 获取帮助
 
-**当前维护者**: lingma-workflow skill team  
-**最后更新**: 2026-03-19  
-**反馈渠道**: 在项目 issue 中提出文档相关问题
+### 遇到问题？
+
+1. **查看 FAQ** - 每个指南都有常见问题解答
+2. **搜索 Issues** - 可能已经有人问过类似问题
+3. **新建 Issue** - 如果确实没有找到答案
+4. **参与讨论** - 在 Discussion 中分享经验
+
+### 联系方式
+
+- **项目主页**: https://github.com/Kogisune/lingma-workflow
+- **问题反馈**: https://github.com/Kogisune/lingma-workflow/issues
+- **讨论区**: https://github.com/Kogisune/lingma-workflow/discussions
 
 ---
 
-*本指南中心由 lingma-workflow 技能维护，符合项目标准化工作流规范*
+## 🎉 致谢
+
+感谢所有为这些指南做出贡献的开发者和用户！
+
+---
+
+*最后更新：2026-03-19*

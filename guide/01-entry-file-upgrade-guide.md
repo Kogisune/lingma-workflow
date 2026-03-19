@@ -6,29 +6,6 @@
 
 ---
 
-## 📋 变更概述
-
-### 旧版本（v1.0）- 严格模式
-
-```yaml
-铁律 1:
-  description: "入口文件只能是 .lingma/LINGMA.md"
-  condition:
-    type: "path_equality"
-    value: ".lingma/LINGMA.md"
-  on_violation:
-    action: "reject"  # 直接拒绝
-    block_execution: true
-```
-
-**问题**:
-- ❌ 入口不存在时直接拒绝，无法自举
-- ❌ 不允许任何替代入口
-- ❌ 用户体验中断
-- ❌ 缺乏恢复能力
-
----
-
 ### 新版本（v2.0）- 智能自举模式
 
 ```yaml
@@ -361,15 +338,6 @@ node bootstrap-entry.js
 ```bash
 # 手动指定模板类型
 node bootstrap-entry.js --template=complete
-```
-
-### Q: 如何回退到旧版本？
-
-**A**: 修改 SKILL.md：
-```markdown
-# 将铁律 1 改回旧版本逻辑
-# 删除 bootstrap-entry.js
-# 恢复 laws.yaml 配置
 ```
 
 ---
