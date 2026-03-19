@@ -1,0 +1,540 @@
+# Variables Definition and Validation Rules
+# 变量定义和验证规则
+
+# ============================================================
+# 变量定义
+# ============================================================
+
+variables:
+  # ----------------------------------------------------------
+  # 项目相关变量 (proj_*)
+  # ----------------------------------------------------------
+  
+  proj_name:
+    type: string
+    required: true
+    min_length: 2
+    max_length: 50
+    pattern: "^[a-z0-9-]+$"
+    description: "项目简称（小写字母、数字、连字符）"
+    example: "my-awesome-project"
+    
+  proj_full_name:
+    type: string
+    required: true
+    min_length: 5
+    max_length: 100
+    description: "项目全称（可以包含空格和大写字母）"
+    example: "My Awesome Project"
+    
+  proj_description:
+    type: string
+    required: true
+    min_length: 10
+    max_length: 500
+    description: "项目描述（一句话说明项目用途）"
+    example: "一个优秀的物流管理系统"
+    
+  proj_version:
+    type: string
+    required: false
+    default: "1.0.0"
+    pattern: "^\\d+\\.\\d+\\.\\d+(-[a-zA-Z0-9]+)?$"
+    description: "语义化版本号"
+    example: "2.1.0-beta.1"
+    
+  proj_core_modules:
+    type: array
+    required: false
+    min_items: 0
+    max_items: 20
+    item_type: string
+    description: "核心功能模块列表"
+    example:
+      - "订单管理"
+      - "物流追踪"
+      - "成本核算"
+      
+  proj_tech_stack:
+    type: object
+    required: false
+    properties:
+      framework: string
+      language: string
+      ui: string
+      state: string
+    description: "技术栈详情"
+    
+  # ----------------------------------------------------------
+  # 技术栈变量 (tech_*)
+  # ----------------------------------------------------------
+  
+  tech_framework:
+    type: string
+    required: true
+    min_length: 2
+    description: "主要前端框架"
+    example: "Vue 3"
+    allowed_values:
+      - "Vue 3"
+      - "React"
+      - "Angular"
+      - "Svelte"
+      
+  tech_language:
+    type: string
+    required: true
+    min_length: 2
+    description: "主要编程语言"
+    example: "TypeScript"
+    allowed_values:
+      - "TypeScript"
+      - "JavaScript"
+      
+  tech_ui:
+    type: string
+    required: false
+    description: "UI 组件库"
+    example: "Naive UI"
+    
+  tech_state:
+    type: string
+    required: false
+    description: "状态管理方案"
+    example: "Pinia"
+    
+  tech_routing:
+    type: string
+    required: false
+    description: "路由方案"
+    example: "Vue Router"
+    
+  tech_styling:
+    type: string
+    required: false
+    description: "样式方案"
+    example: "UnoCSS + SCSS"
+    
+  # ----------------------------------------------------------
+  # 阶段变量 (stage_*)
+  # ----------------------------------------------------------
+  
+  stage_current:
+    type: string
+    required: true
+    min_length: 5
+    description: "当前阶段名称"
+    example: "Phase 2 - 功能完善"
+    
+  stage_status:
+    type: string
+    required: true
+    min_length: 2
+    description: "当前阶段状态"
+    example: "已完成"
+    allowed_values:
+      - "已完成"
+      - "进行中"
+      - "规划中"
+      - "暂停"
+      
+  stage_icon:
+    type: string
+    required: false
+    default: "⏸️"
+    description: "阶段状态图标"
+    allowed_values:
+      - "✅"   # 已完成
+      - "⏸️"   # 进行中
+      - "📋"   # 规划中
+      - "🔲"   # 待开始
+      - "⚠️"   # 警告
+      
+  stage_completion:
+    type: string
+    required: false
+    default: "0%"
+    pattern: "^\\d{1,3}%$"
+    description: "完成度百分比"
+    example: "75%"
+    
+  stage_next:
+    type: string
+    required: false
+    description: "下一阶段名称"
+    example: "Phase 3 - 优化迭代"
+    
+  stage_previous:
+    type: string
+    required: false
+    description: "上一阶段名称"
+    example: "Phase 1 - MVP"
+    
+  # ----------------------------------------------------------
+  # 文档变量 (doc_*)
+  # ----------------------------------------------------------
+  
+  doc_guidelines_path:
+    type: string
+    required: true
+    pattern: "^\\.lingma/workflow/.*\\.md$"
+    description: "协作规范文件路径"
+    default: ".lingma/workflow/project_guidelines.md"
+    
+  doc_guidelines_title:
+    type: string
+    required: false
+    default: "协作规范"
+    description: "协作规范显示标题"
+    
+  doc_guidelines_desc:
+    type: string
+    required: false
+    default: "Lingma 角色和行为准则"
+    description: "协作规范描述"
+    
+  doc_workflow_path:
+    type: string
+    required: true
+    pattern: "^\\.lingma/workflow/.*\\.md$"
+    description: "工作流程文件路径"
+    default: ".lingma/workflow/WORKFLOW.md"
+    
+  doc_tasks_path:
+    type: string
+    required: true
+    pattern: "^\\.lingma/workflow/.*\\.md$"
+    description: "任务分解文件路径"
+    default: ".lingma/workflow/task_breakdown.md"
+    
+  doc_readme_path:
+    type: string
+    required: false
+    default: ".lingma/workflow/README.md"
+    description: "目录说明文件路径"
+    
+  # ----------------------------------------------------------
+  # 元数据变量 (meta_*)
+  # ----------------------------------------------------------
+  
+  meta_version:
+    type: string
+    required: false
+    default: "1.0"
+    description: "工作流文档版本号"
+    
+  meta_date:
+    type: string
+    required: false
+    format: "date"
+    auto_generate: true
+    description: "最后更新日期（自动生成）"
+    example: "2026-03-19"
+    
+  meta_maintainer:
+    type: string
+    required: false
+    default: "lingma-workflow skill team"
+    description: "维护者信息"
+    
+  # ----------------------------------------------------------
+  # 其他变量
+  # ----------------------------------------------------------
+  
+  workflow_dir:
+    type: string
+    required: false
+    default: ".lingma/workflow"
+    description: "工作流目录路径"
+    
+  entry_file_path:
+    type: string
+    required: false
+    default: ".lingma/LINGMA.md"
+    description: "入口文件路径"
+    
+  skill_trigger_keywords:
+    type: array
+    required: false
+    item_type: string
+    description: "技能触发关键词列表"
+    example:
+      - "工作流"
+      - "项目规范"
+      - "阶段检查"
+
+# ============================================================
+# 验证规则
+# ============================================================
+
+validation:
+  # ----------------------------------------------------------
+  # Guidelines 完整性验证
+  # ----------------------------------------------------------
+  
+  guidelines_completeness:
+    enabled: true
+    min_score: 85
+    
+    chapters:
+      - id: 1
+        name: "Role"
+        pattern: "^##\\s*1\\.\\s*Role"
+        min_length: 50
+        min_items: 3
+        weight: 1.5
+        
+      - id: 2
+        name: "What Lingma Should Prefer"
+        pattern: "^##\\s*2\\.\\s*.*Prefer"
+        min_items: 1
+        weight: 1.0
+        
+      - id: 3
+        name: "What Lingma Should Avoid"
+        pattern: "^##\\s*3\\.\\s*.*Avoid"
+        min_items: 1
+        weight: 1.0
+        
+      - id: 4
+        name: "Response Rules"
+        pattern: "^##\\s*4\\.\\s*Response Rules"
+        min_items: 1
+        weight: 1.0
+        
+      - id: 5
+        name: "Current Canonical Terms"
+        pattern: "^##\\s*5\\.\\s*Current Canonical Terms"
+        allow_empty: true
+        warning_if_empty: true
+        weight: 0.5
+        
+      - id: 6
+        name: "Deliverable Standard"
+        pattern: "^##\\s*6\\.\\s*Deliverable Standard"
+        min_items: 3
+        weight: 1.0
+        
+      - id: 7
+        name: "Suggested Next Deliverables"
+        pattern: "^##\\s*7\\.\\s*Suggested Next"
+        min_items: 1
+        weight: 1.0
+    
+    scoring:
+      calculation: "weighted_average"
+      round_to: 1
+      
+  # ----------------------------------------------------------
+  # 交叉引用验证
+  # ----------------------------------------------------------
+  
+  cross_references:
+    enabled: true
+    
+    required_references:
+      - from: "LINGMA.md"
+        to: "project_guidelines.md"
+        check_anchor: false
+        
+      - from: "LINGMA.md"
+        to: "WORKFLOW.md"
+        check_anchor: false
+        
+      - from: "LINGMA.md"
+        to: "task_breakdown.md"
+        check_anchor: false
+        
+      - from: "WORKFLOW.md"
+        to: "task_breakdown.md"
+        check_anchor: true
+        
+      - from: "project_guidelines.md"
+        to: "WORKFLOW.md"
+        check_anchor: false
+        
+  # ----------------------------------------------------------
+  # 链接验证
+  # ----------------------------------------------------------
+  
+  links:
+    enabled: true
+    
+    check_internal: true
+    check_external: false
+    
+    timeout: 5000  # 外部链接超时时间（毫秒）
+    
+    ignore_patterns:
+      - "*.md"
+      - "#*"
+      
+  # ----------------------------------------------------------
+  # 术语一致性验证
+  # ----------------------------------------------------------
+  
+  terminology:
+    enabled: true
+    
+    case_sensitive: false
+    
+    ignore_code_blocks: true
+    
+    custom_dictionary: "./dictionaries/project-terms.yaml"
+    
+    common_confusions:
+      - terms: ["订单", "Order"]
+        preferred: "订单"
+        
+      - terms: ["运单", "Shipment"]
+        preferred: "运单"
+        
+      - terms: ["包裹", "Package"]
+        preferred: "包裹"
+        
+  # ----------------------------------------------------------
+  # 格式验证
+  # ----------------------------------------------------------
+  
+  formatting:
+    enabled: true
+    
+    rules:
+      - name: "no_trailing_whitespace"
+        enabled: true
+        
+      - name: "single_newline_at_eof"
+        enabled: true
+        
+      - name: "consistent_heading_style"
+        enabled: true
+        style: "atx"  # atx | setext
+        
+      - name: "max_line_length"
+        enabled: false
+        max_length: 120
+        
+      - name: "proper_list_formatting"
+        enabled: true
+        
+  # ----------------------------------------------------------
+  # 阶段对齐验证
+  # ----------------------------------------------------------
+  
+  stage_alignment:
+    enabled: true
+    
+    check_consistency: true
+    
+    documents:
+      - "LINGMA.md"
+      - "project_status.md"
+      - "task_breakdown.md"
+      - "WORKFLOW.md"
+    
+    fields:
+      - "stage_current"
+      - "stage_status"
+      - "stage_next"
+
+# ============================================================
+# 错误消息模板
+# ============================================================
+
+error_messages:
+  # 变量错误
+  
+  variable_required: "缺少必需变量：{variable_name}"
+  variable_invalid_type: "变量 {variable_name} 类型错误，期望 {expected_type}，实际为 {actual_type}"
+  variable_too_short: "变量 {variable_name} 长度过短，最小长度为 {min_length}"
+  variable_too_long: "变量 {variable_name} 长度过长，最大长度为 {max_length}"
+  variable_invalid_pattern: "变量 {variable_name} 格式不正确，应符合模式：{pattern}"
+  
+  # 验证错误
+  
+  guidelines_incomplete: "Guidelines 完整性不足，得分 {score}/100，最低要求 {min_score}"
+  missing_chapter: "Guidelines 缺少章节：{chapter_name}"
+  broken_link: "发现失效链接：{link}"
+  terminology_inconsistent: "术语使用不一致：{terms}"
+  stage_mismatch: "多个文档中的阶段信息不一致"
+  
+  # 建议消息
+  
+  suggestion_add_content: "建议补充 {section} 章节的内容"
+  suggestion_update_date: "建议更新文档日期（当前为 {old_date}）"
+  suggestion_fix_link: "请修复或移除失效链接：{link}"
+  suggestion_unify_terms: "请统一术语使用，建议使用：{preferred}"
+
+# ============================================================
+# 自动修复规则
+# ============================================================
+
+auto_fix:
+  enabled: false
+  
+  rules:
+    - name: "add_missing_newline_at_eof"
+      enabled: true
+      
+    - name: "remove_trailing_whitespace"
+      enabled: true
+      
+    - name: "fix_list_indentation"
+      enabled: true
+      
+    - name: "normalize_headings"
+      enabled: false  # 需要人工确认
+      
+    - name: "unify_terminology"
+      enabled: false  # 需要人工确认
+      confidence_threshold: 0.9
+
+---
+
+# 📝 使用说明
+
+## 验证配置
+
+```bash
+# 验证所有变量
+generator validate-variables --config project-config.yaml
+
+# 验证特定变量
+generator validate-variable proj_name --value "my-project"
+
+# 运行完整性检查
+generator check-completeness --verbose
+```
+
+## 自定义验证规则
+
+在配置文件中添加自定义规则：
+
+```yaml
+validation:
+  custom_rules:
+    - name: "my_custom_rule"
+      enabled: true
+      check: |
+        function(content) {
+          // 自定义检查逻辑
+          return content.includes('required-text');
+        }
+      error_message: "内容必须包含 'required-text'"
+```
+
+## 扩展变量字典
+
+```yaml
+variables:
+  my_custom_variable:
+    type: string
+    required: false
+    default: "default value"
+    description: "我的自定义变量"
+```
+
+---
+
+**最后更新**: 2026-03-19  
+**维护者**: lingma-workflow skill team

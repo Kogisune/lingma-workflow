@@ -1,0 +1,391 @@
+# Workflow Generator Configuration Example
+# 工作流生成器配置示例
+
+# ============================================================
+# 项目基本配置
+# ============================================================
+
+project:
+  # 项目简称（必需）- 用于文档标题和引用
+  name: "my-project"
+  
+  # 项目全称（必需）- 完整的项目名称
+  full_name: "My Awesome Project"
+  
+  # 项目版本（可选）- 默认值："1.0.0"
+  version: "1.0.0"
+  
+  # 项目描述（必需）- 一句话描述项目用途
+  description: "一个优秀的项目，用于演示工作流生成器的使用"
+
+# ============================================================
+# 技术栈配置
+# ============================================================
+
+tech_stack:
+  # 主要框架（必需）
+  framework: "Vue 3"
+  
+  # 编程语言（必需）
+  language: "TypeScript"
+  
+  # UI 组件库（可选）
+  ui_library: "Naive UI"
+  
+  # 状态管理（可选）
+  state_management: "Pinia"
+  
+  # 路由方案（可选）
+  routing: "Vue Router"
+  
+  # 样式方案（可选）
+  styling: "UnoCSS + SCSS"
+  
+  # HTTP 客户端（可选）
+  http_client: "Axios"
+  
+  # 构建工具（可选）
+  build_tool: "Vite"
+
+# ============================================================
+# 阶段配置
+# ============================================================
+
+stages:
+  # 当前阶段（必需）
+  current:
+    # 阶段标识符（内部使用）
+    id: "phase_2"
+    
+    # 阶段显示名称
+    name: "Phase 2 - 功能完善"
+    
+    # 状态文本
+    status: "已完成"
+    
+    # 状态图标
+    icon: "✅"
+    
+    # 完成度百分比
+    completion: "100%"
+    
+    # 详细描述（可选）
+    description: |
+      完成了核心功能的开发和测试
+      
+  # 上一阶段（可选）
+  previous:
+    id: "phase_1"
+    name: "Phase 1 - MVP"
+    status: "已完成"
+    icon: "✅"
+    completion: "100%"
+    
+  # 下一阶段（可选）
+  next:
+    id: "phase_3"
+    name: "Phase 3 - 优化迭代"
+    status: "规划中"
+    icon: "📋"
+    completion: "0%"
+
+# ============================================================
+# 文档配置
+# ============================================================
+
+documents:
+  # 入口文件配置
+  entry:
+    path: ".lingma/LINGMA.md"
+    title: "工作流入口"
+    description: "快速开始和项目概览"
+    include_navigation: true
+    include_quick_start: true
+    
+  # 协作规范配置
+  guidelines:
+    path: ".lingma/workflow/project_guidelines.md"
+    title: "协作规范"
+    description: "Lingma 角色和行为准则"
+    validate_chapters: true
+    min_items_per_chapter: 3
+    
+  # 工作流程配置
+  workflow:
+    path: ".lingma/workflow/WORKFLOW.md"
+    title: "工作流程"
+    description: "标准执行流程"
+    include_steps:
+      - health_check
+      - task_execution
+      - documentation_update
+      
+  # 目录说明配置
+  readme:
+    path: ".lingma/workflow/README.md"
+    title: "目录说明"
+    description: "工作流目录导航"
+    include_structure: true
+    
+  # 项目状态配置
+  status:
+    path: ".lingma/workflow/project_status.md"
+    title: "项目状态"
+    description: "详细项目档案"
+    include_all_sections: true
+    
+  # 任务分解配置
+  tasks:
+    path: ".lingma/workflow/task_breakdown.md"
+    title: "任务分解"
+    description: "任务清单和进度"
+    show_progress_bar: true
+    show_gantt_chart: false
+
+# ============================================================
+# 生成选项
+# ============================================================
+
+generation:
+  # 输出目录
+  output_dir: ".lingma/workflow"
+  
+  # 是否包含扩展模板
+  include_optional_templates: false
+  
+  # 生成时是否验证
+  validate_on_generate: true
+  
+  # 覆盖前是否备份
+  backup_before_overwrite: true
+  
+  # 是否格式化 Markdown
+  format_markdown: true
+  
+  # 是否生成目录
+  generate_toc: true
+  
+  # 使用的语言
+  language: "zh-CN"
+  
+  # 使用的主题
+  theme: "minimal"  # minimal | detailed | formal | casual
+
+# ============================================================
+# 质量检查配置
+# ============================================================
+
+quality:
+  # Guidelines 最低分数要求
+  min_guidelines_score: 85
+  
+  # 是否检查交叉引用
+  required_cross_references: true
+  
+  # 是否检查失效链接
+  check_broken_links: true
+  
+  # 是否验证 YAML 语法
+  validate_yaml_syntax: true
+  
+  # 是否检查术语一致性
+  check_terminology_consistency: true
+  
+  # 是否检查阶段对齐
+  check_stage_alignment: true
+
+# ============================================================
+# 自定义变量
+# ============================================================
+
+custom_variables:
+  # 可以在这里定义项目特定的变量
+  # 这些变量可以在模板中通过 {custom_variable_name} 引用
+  
+  team_name: "开发团队"
+  contact_email: "team@example.com"
+  documentation_url: "https://docs.example.com"
+  issue_tracker: "https://github.com/example/repo/issues"
+
+# ============================================================
+# 插件配置
+# ============================================================
+
+plugins:
+  # 启用的插件列表
+  enabled:
+    - "termo-checker"     # 术语检查插件
+    - "link-validator"     # 链接验证插件
+    
+  # 插件配置
+  config:
+    termo-checker:
+      dictionary: "./dictionaries/project-terms.yaml"
+      auto_fix: false
+      
+    link-validator:
+      check_external: true
+      timeout: 5000
+
+# ============================================================
+# 备份配置
+# ============================================================
+
+backup:
+  # 是否启用备份
+  enabled: true
+  
+  # 备份目录
+  backup_dir: ".lingma/workflow/.backups"
+  
+  # 保留的备份数量
+  keep_count: 5
+  
+  # 备份前缀
+  prefix: "backup-"
+  
+  # 备份时间戳格式
+  timestamp_format: "YYYYMMDD-HHmmss"
+
+# ============================================================
+# 日志配置
+# ============================================================
+
+logging:
+  # 日志级别
+  level: "info"  # debug | info | warn | error
+  
+  # 日志输出
+  output:
+    - console
+    - file
+    
+  # 日志文件路径
+  file_path: ".lingma/logs/generator.log"
+  
+  # 是否记录详细输出
+  verbose: false
+
+# ============================================================
+# 钩子函数
+# ============================================================
+
+hooks:
+  # 生成前执行的钩子
+  before_generate: |
+    console.log('开始生成工作流文档...');
+    // 可以在这里执行一些预处理逻辑
+    
+  # 生成后执行的钩子
+  after_generate: |
+    console.log('工作流文档生成完成！');
+    // 可以在这里执行一些后处理逻辑
+    
+  # 验证前执行的钩子
+  before_validate: |
+    console.log('开始验证文档...');
+    
+  # 验证后执行的钩子
+  after_validate: |
+    console.log('文档验证完成！');
+
+# ============================================================
+# 示例场景配置
+# ============================================================
+
+examples:
+  # 示例 1: 新项目初始化
+  new_project:
+    description: "为新项目生成完整的工作流文档"
+    config:
+      include_optional_templates: false
+      validate_on_generate: true
+      generate_all_core: true
+      
+  # 示例 2: 只更新 Guidelines
+  update_guidelines:
+    description: "只更新协作规范文档"
+    config:
+      templates:
+        - guidelines
+      validate_chapters: true
+      
+  # 示例 3: 阶段切换
+  phase_transition:
+    description: "从一个阶段切换到另一个阶段"
+    config:
+      update_stage_info: true
+      archive_previous: true
+      create_new_tasks: true
+
+---
+
+# 📝 使用说明
+
+## 快速开始
+
+```bash
+# 1. 复制此配置文件
+cp project-config.yaml.example my-project-config.yaml
+
+# 2. 编辑配置文件
+code my-project-config.yaml
+
+# 3. 生成工作流文档
+generator generate all --config my-project-config.yaml
+
+# 4. 验证生成的文档
+generator validate --config my-project-config.yaml
+```
+
+## 配置项说明
+
+### 必需配置项
+
+以下配置项必须提供：
+
+```yaml
+project:
+  name: "your-project-name"      # 项目简称
+  full_name: "Your Project"      # 项目全称
+  description: "项目描述"         # 一句话描述
+
+tech_stack:
+  framework: "框架名"             # 如：Vue 3, React
+  language: "语言名"              # 如：TypeScript, JavaScript
+
+stages:
+  current:
+    name: "阶段名"                # 如：Phase 1 - MVP
+    status: "状态"                # 如：已完成、进行中
+```
+
+### 可选配置项
+
+其他所有配置项都是可选的，会使用合理的默认值。
+
+## 环境变量
+
+可以使用环境变量覆盖配置：
+
+```bash
+export WORKFLOW_OUTPUT_DIR="./custom/output"
+export WORKFLOW_THEME="detailed"
+
+generator generate all --config my-project-config.yaml
+```
+
+## 配置验证
+
+```bash
+# 验证配置文件语法
+generator validate-config my-project-config.yaml
+
+# 检查配置完整性
+generator check-config my-project-config.yaml --verbose
+```
+
+---
+
+**最后更新**: 2026-03-19  
+**维护者**: lingma-workflow skill team

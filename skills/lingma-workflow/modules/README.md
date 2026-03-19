@@ -18,22 +18,72 @@
 - ✅ 模板生成和管理
 - ✅ 入口文件验证
 
+**相关工具**:
+- [`bootstrap-entry.js`](../bootstrap-entry.js) - 命令行实现
+
+---
+
+### 2. Workflow Generator (工作流生成器)
+
+**文件**: [`workflow-generator-module.md`](./workflow-generator-module.md)  
+**版本**: 1.0  
+**职责**: 封装所有与工作流文档生成相关的逻辑，提供标准化的模板体系
+
+**核心功能**:
+- ✅ 模板管理（加载、版本控制、组合）
+- ✅ 变量替换（简单变量、条件块、列表）
+- ✅ 文档生成（基于模板生成完整文档）
+- ✅ 质量检查（完整性验证、链接检查）
+
+**提供模板**:
+- 📄 `template-entry.md` - LINGMA.md 入口文件模板
+- 📄 `template-guidelines.md` - project_guidelines.md 协作规范模板
+- 📄 `template-workflow.md` - WORKFLOW.md 工作流程模板
+- 📄 `template-readme.md` - README.md 目录说明模板
+- 📄 `template-status.md` - project_status.md 项目状态模板
+- 📄 `task-breakdown.md` - task_breakdown.md 任务分解模板
+
 **调用方式**:
 ```markdown
 ## 在主技能中调用
 
-读取模块：`modules/entry-file-handler.md`
+读取模块：`modules/workflow-generator-module.md`
 
-执行函数:
-- detect_entry()           # 检测入口文件
-- start_bootstrap_flow()   # 启动自举流程
-- create_entry_file(type)  # 创建入口文件
-- validate_content(content) # 验证内容质量
+执行流程:
+1. 加载必要模板 → load_template('entry')
+2. 准备上下文数据 → context = prepare_context(project_info)
+3. 生成文档 → generate_document(template, context)
+4. 质量检查 → validate_document(generated_doc)
+5. 输出结果 → save_to_file(generated_doc, target_path)
 ```
 
-**相关工具**:
-- [`bootstrap-entry.js`](../bootstrap-entry.js) - 命令行实现
-- [`ENTRY_FILE_UPGRADE_GUIDE.md`](../ENTRY_FILE_UPGRADE_GUIDE.md) - 升级指南
+**API 接口**:
+```pseudo
+load_template(template_name) → Template
+generate_document(template, context) → Document
+replace_variables(content, variables) → string
+validate_document(document) → QualityReport
+```
+
+**相关配置**:
+- [`templates/README.md`](../templates/README.md) - 模板索引和使用说明
+- [`templates/config/project-config.yaml.example`](../templates/config/project-config.yaml.example) - 配置示例
+- [`templates/config/variables-validation.yaml`](../templates/config/variables-validation.yaml) - 变量定义和验证规则
+
+**使用示例**:
+```bash
+# 生成完整工作流
+generator generate all --config project-config.yaml --output-dir .lingma/workflow
+
+# 生成单个文档
+generator generate guidelines --output project_guidelines.md --validate-chapters
+```
+
+**特点**:
+- 🎯 **业务解耦**: 模板不包含具体业务细节，完全通用化
+- 🔧 **配置驱动**: 通过 YAML 配置文件控制生成过程
+- 📊 **质量保证**: 内置完整性检查和验证机制
+- 🌐 **可扩展**: 支持自定义模板和插件系统
 
 ---
 
@@ -265,6 +315,7 @@ invalidate_on:
 | 模块名称 | 版本 | 状态 | 负责人 | 最后更新 |
 |---------|------|------|--------|----------|
 | entry-file-handler | 1.0 | ✅ 已完成 | - | 2026-03-18 |
+| workflow-generator | 1.0 | ✅ 已完成 | - | 2026-03-19 |
 | path-guardian | 0.1 | 🔧 开发中 | - | - |
 | guidelines-checker | 0.1 | 🔧 开发中 | - | - |
 | doc-aligner | 0.0 | 📋 规划中 | - | - |
@@ -283,6 +334,7 @@ invalidate_on:
 
 ### Phase 1: 基础模块（已完成）✅
 - [x] entry-file-handler (2026-03-18)
+- [x] workflow-generator (2026-03-19)
 
 ### Phase 2: 验证模块（2026-Q2）🔧
 - [ ] path-guardian (2026-04)
