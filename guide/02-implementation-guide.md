@@ -1,8 +1,8 @@
 # lingma-workflow 技能优化实施指南
 
-**版本**: 1.0  
-**更新日期**: 2026-03-18  
-**对应阶段**: Phase 1-3 完整实施路径
+**版本**: 2.0  
+**更新日期**: 2026-03-19  
+**对应阶段**: Phase 1-4 完整实施路径
 
 ---
 
@@ -297,7 +297,127 @@ mkdir -p modules rules tools
 
 ---
 
-## 🤖 Phase 3：自动化闭环（2 周）
+## 🚀 Phase 4：文档生成系统（2 周）
+
+### 目标
+实现基于模板的自动化文档生成，完全与业务解耦
+
+### 任务清单
+
+#### 🔨 4.1 创建工作流生成器模块
+
+**文件位置**: `.lingma/skills/lingma-workflow/modules/workflow-generator-module.md`
+
+**操作**:
+```bash
+# 创建模块文件
+touch modules/workflow-generator-module.md
+
+# 实现核心功能
+code modules/workflow-generator-module.md
+```
+
+**核心功能**:
+- [ ] 模板管理（加载、版本控制、组合）
+- [ ] 变量替换（简单变量、条件块、列表）
+- [ ] 文档生成（基于模板生成完整文档）
+- [ ] 质量检查（完整性验证、链接检查）
+
+---
+
+#### 🔨 4.2 建立模板体系
+
+**目录结构**:
+```
+templates/
+├── core/                    # 核心模板（必需）
+│   ├── template-entry.md
+│   ├── template-guidelines.md
+│   ├── template-workflow.md
+│   ├── template-readme.md
+│   ├── template-status.md
+│   └── task-breakdown.md
+│
+├── optional/                # 扩展模板（可选）
+│   ├── template-analysis.md
+│   └── template-implementation.md
+│
+└── config/                  # 配置文件
+    ├── project-config.yaml.example
+    └── variables-validation.yaml
+```
+
+**验收标准**:
+- [ ] 6 个核心模板全部完成
+- [ ] 每个模板都通过业务解耦验证
+- [ ] 提供完整的配置示例
+- [ ] 建立变量定义和验证规则
+
+---
+
+#### 🔨 4.3 实现配置化管理
+
+**配置文件**:
+```yaml
+# project-config.yaml
+project:
+  name: "my-project"
+  full_name: "My Awesome Project"
+  description: "一个优秀的项目"
+
+tech_stack:
+  framework: "Vue 3"
+  language: "TypeScript"
+
+stages:
+  current:
+    name: "Phase 1 - MVP"
+    status: "已完成"
+```
+
+**功能要求**:
+- [ ] 支持环境变量覆盖配置
+- [ ] 提供默认值机制
+- [ ] 验证配置完整性
+- [ ] 生成配置错误报告
+
+---
+
+#### 🔨 4.4 建立质量保证体系
+
+**验证层次**:
+```yaml
+Level 1: 变量验证（类型、长度、格式）
+Level 2: 文档完整性（7 章检查，权重评分）
+Level 3: 交叉验证（引用、术语、阶段对齐）
+```
+
+**验收标准**:
+- [ ] Guidelines 完整性检查 ≥ 85 分
+- [ ] 所有交叉引用有效
+- [ ] 术语使用一致
+- [ ] 格式符合规范
+
+---
+
+### Phase 4 交付物
+
+```
+.lingma/skills/lingma-workflow/
+├── modules/
+│   └── workflow-generator-module.md    ✨ 新增
+│
+├── templates/                          ✨ 新增目录
+│   ├── core/                           # 6 个核心模板
+│   ├── optional/                       # 3 个扩展模板
+│   └── config/                         # 配置文件
+│
+└── QUICK_REFERENCE.md                  ✨ 快速参考指南
+```
+
+---
+
+## 📊 各阶段对比
 
 ### 目标
 实现全方位自动化监控和自愈
