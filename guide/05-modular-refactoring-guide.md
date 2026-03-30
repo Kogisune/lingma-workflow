@@ -1,7 +1,7 @@
 # lingma-workflow 模块化重构指南
 
-**版本**: 2.1  
-**更新日期**: 2026-03-19  
+**版本**: 2.2  
+**更新日期**: 2026-03-30
 **难度**: 中级  
 **预计时间**: 2 周
 
@@ -13,8 +13,8 @@
 
 ### 核心目标
 
-- ✅ **减轻主文件负担** - 从 574 行减少到 454 行（-21%）
-- ✅ **实现按需加载** - 仅在需要时加载相关模块
+- ✅ **减轻主文件负担** - SKILL.md 从 464 行减少到约 100 行（-78%）
+- ✅ **精简模块文档** - entry-file-handler.md 从 651 行减少到约 90 行（-86%）
 - ✅ **提升可维护性** - 每个模块职责单一，易于测试和修改
 - ✅ **保持兼容性** - 所有原有功能完整保留
 
@@ -58,9 +58,8 @@ entry-file-handler:
 不要一次性重构所有代码：
 
 ```
-Phase 1: entry-file-handler ✅
-Phase 2: path-guardian 🔧
-Phase 3: guidelines-checker 📋
+Phase 1: entry-file-handler ✅ (v2.2 精简完成)
+Phase 2: workflow-generator ✅ (已有)
 ```
 
 ---
@@ -218,22 +217,22 @@ grep -r "铁律 1.*详细" .
 ## 📦 新的目录结构
 
 ```
-.lingma/skills/lingma-workflow/
-├── SKILL.md                          # 主技能文件（精简版）
-├── README.md                         # 使用说明
+skills/lingma-workflow/
+├── SKILL.md                          # 主技能文件（精简版，~100 行）
+├── README.md                         # 使用说明（精简版，~90 行）
+├── QUICK_REFERENCE.md                # 快速参考（重写版，~90 行）
 ├── examples.md                       # 示例文档
-├── bootstrap-entry.js                # 命令行工具
-├── ENTRY_FILE_UPGRADE_GUIDE.md       # 升级指南
+├── bootstrap-entry.js                # 自举脚本（已修复 bug）
 ├── laws.yaml.example                 # YAML 配置模板
 ├── validate.js.template              # 验证脚本模板
 │
-├── modules/                          ✨ 新增：模块目录
-│   ├── README.md                     # 模块索引
-│   └── entry-file-handler.md         # 入口处理模块
+├── modules/                          # 模块目录
+│   ├── README.md                     # 模块索引（~60 行）
+│   ├── entry-file-handler.md         # 入口处理模块（~90 行）
+│   └── workflow-generator-module.md  # 工作流生成模块
 │
-└── tools/                            # 未来：工具目录
-    ├── validate.js
-    └── dashboard-generator.js
+└── templates/                        # 模板目录
+    └── config/                       # 配置文件
 ```
 
 ---
@@ -304,19 +303,24 @@ grep -r "铁律 1.*详细" .
 | 仅验证路径 | ~50ms | ~30ms | -40%（不加载入口处理逻辑） |
 | 完整流程 | ~50ms | ~50ms | 持平 |
 
-### 代码行数
+### 代码行数（v2.2 实际数据）
 
 | 文件 | 变更前 | 变更后 | 变化 |
 |------|--------|--------|------|
-| SKILL.md | 574 行 | 454 行 | **-120 行 (-21%)** |
-| modules/entry-file-handler.md | - | 651 行 | **+651 行 (新增)** |
-| modules/README.md | - | 311 行 | **+311 行 (新增)** |
+| SKILL.md | 464 行 | ~100 行 | **-364 行 (-78%)** |
+| README.md | 385 行 | ~90 行 | **-295 行 (-77%)** |
+| modules/entry-file-handler.md | 651 行 | ~90 行 | **-561 行 (-86%)** |
+| modules/README.md | 367 行 | ~60 行 | **-307 行 (-84%)** |
+| QUICK_REFERENCE.md | 387 行 | ~90 行 | **-297 行 (-77%)** |
+| **合计** | **2254 行** | **~430 行** | **-1824 行 (-81%)** |
 
 ---
 
 ## 🔮 未来扩展
 
-### 即将开发的模块
+### 可考虑扩展的模块
+
+> 以下模块可根据实际需求按需开发
 
 #### 1. Path Guardian（路径守卫）
 
@@ -340,17 +344,6 @@ features:
   - 内容质量评分
   - 术语一致性检查
   - 交叉引用验证
-```
-
-#### 3. Doc Aligner（文档对齐器）
-
-```yaml
-module: doc-aligner
-status: concept
-features:
-  - 跨文档引用检查
-  - 阶段信息同步
-  - 冲突检测与解决
 ```
 
 ---
@@ -422,11 +415,10 @@ describe('EntryFileHandler', () => {
 
 ### 代码质量
 
-- [ ] 主技能文件减少到 500 行以内
-- [ ] 模块职责单一明确
-- [ ] 提供清晰的模块调用接口
-- [ ] 保留所有原有功能
-- [ ] 添加模块索引和导航
+- [x] 主技能文件减少到 200 行以内（实际 ~100 行）
+- [x] 模块职责单一明确
+- [x] 保留所有原有功能
+- [x] 添加模块索引和导航
 
 ### 文档完整性
 
@@ -444,4 +436,4 @@ describe('EntryFileHandler', () => {
 
 ---
 
-*本指南由 lingma-workflow 技能辅助生成，符合项目标准化工作流规范*
+*本指南最后更新于 2026-03-30 (v2.2)*

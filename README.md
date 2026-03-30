@@ -1,8 +1,8 @@
 # lingma-workflow
 
 **Lingma IDE 标准化工作流技能**  
-**版本**: 2.1 (智能自举模式)  
-**更新日期**: 2026-03-19
+**版本**: 2.2 (优化版)  
+**更新日期**: 2026-03-30
 
 [![Validation](https://img.shields.io/badge/validation-passing-brightgreen)](guide/02-implementation-guide.md)
 [![Phase](https://img.shields.io/badge/phase-1--3-blue)](guide/02-implementation-guide.md)
@@ -93,19 +93,14 @@
 
 ```
 lingma-workflow/
-├── .lingma/
-│   ├── skills/
-│   │   └── lingma-workflow/     # 技能主目录
-│   │       ├── SKILL.md         # 技能定义
-│   │       ├── laws.yaml        # 铁律配置
-│   │       ├── validate.js      # 验证脚本
-│   │       └── modules/         # 模块化组件
-│   └── workflow/                # 工作流文档
-├── guide/                       # 📚 完整指南中心
-│   ├── 01-entry-file-upgrade-guide.md
-│   ├── 02-implementation-guide.md
-│   ├── 05-modular-refactoring-guide.md
-│   └── 06-document-generator-guide.md
+├── skills/
+│   └── lingma-workflow/     # 技能主目录
+│       ├── SKILL.md         # 技能定义
+│       ├── laws.yaml.example # 铁律配置示例
+│       ├── bootstrap-entry.js # 入口自举脚本
+│       ├── validate.js.template # 验证脚本模板
+│       └── modules/         # 功能模块
+├── guide/                   # 指南中心
 ├── LICENSE
 └── README.md
 ```
@@ -136,6 +131,7 @@ cp laws.yaml.example laws.yaml
 #### Step 3: 运行验证
 
 ```bash
+cp validate.js.template validate.js
 node validate.js
 ```
 
@@ -179,17 +175,14 @@ node validate.js
 | 模块 | 职责 | 位置 |
 |------|------|------|
 | **Entry File Handler** | 入口检测、验证和自举 | [modules/entry-file-handler.md](skills/lingma-workflow/modules/entry-file-handler.md) |
-| **Path Guardian** | 路径合法性验证 | [modules/path-guardian.md](skills/lingma-workflow/modules/path-guardian.md) |
-| **Guidelines Checker** | 协作规范完整性检查 | [modules/guidelines-checker.md](skills/lingma-workflow/modules/guidelines-checker.md) |
-| **Doc Aligner** | 文档对齐和一致性维护 | [modules/doc-aligner.md](skills/lingma-workflow/modules/doc-aligner.md) |
+| **Workflow Generator** | 工作流文档生成和模板管理 | [modules/workflow-generator-module.md](skills/lingma-workflow/modules/workflow-generator-module.md) |
 
-### 工具模块
+### 工具脚本
 
 | 工具 | 功能 |
 |------|------|
-| `validate.js` | 铁律验证脚本（CLI + 编程调用） |
 | `bootstrap-entry.js` | 入口文件自举向导 |
-| `dashboard-generator.js` | 健康仪表板生成器 |
+| `validate.js.template` | 铁律验证脚本模板 |
 
 完整模块文档见 [modules/README.md](skills/lingma-workflow/modules/README.md)
 

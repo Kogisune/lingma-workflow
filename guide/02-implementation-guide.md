@@ -1,7 +1,7 @@
 # lingma-workflow 技能优化实施指南
 
-**版本**: 2.1 
-**更新日期**: 2026-03-19  
+**版本**: 2.2 
+**更新日期**: 2026-03-30
 **对应阶段**: Phase 1-4 完整实施路径
 
 ---
@@ -249,50 +249,42 @@ mkdir -p modules rules tools
 - 防止大小写混淆
 ```
 
-#### 🔨 2.3 简化 SKILL.md
+#### 🤖 2.2 简化 SKILL.md（已在 v2.2 完成）✅
 
-**目标**: 从 381 行减少到 150 行以内
+**目标**: 从 464 行减少到约 100 行（减少 78%）
 
-**方法**:
-1. 将验证逻辑移到 modules/
-2. 将规则定义移到 laws.yaml
-3. SKILL.md 只保留编排逻辑
+**已实施**:
+1. 移除冗余伪代码和重复示例
+2. 将验证逻辑精简到模块文档
+3. SKILL.md 只保留核心执行信息
 
-**修改前后对比**:
+**效果**:
 ```diff
 - ## ⚖️ 铁律约束（必须遵守）
-- （98 行详细规则定义）
+- （98 行详细规则定义和伪代码）
 + ## ⚖️ 铁律约束
-+ 详见：[laws.yaml](laws.yaml)
++ 详见：[laws.yaml](laws.yaml.example)
 
 - ### Step 2: 加载上下文文档
-- （详细的验证逻辑，50+ 行）
+- （详细的验证伪代码，50+ 行）
 + ### Step 2: 加载上下文文档
-+ 调用 `modules/entry_validator.md` 验证入口
-+ 调用 `modules/path_guardian.md` 验证路径
-+ 调用 `modules/guidelines_checker.md` 验证完整性
++ 调用模块进行验证（详见 modules/entry-file-handler.md）
 ```
 
 ---
 
-### Phase 2 交付物
+### Phase 2 交付物（v2.2 已完成）
 
 ```
 .lingma/skills/lingma-workflow/
-├── SKILL.md               🔄 重构：精简到 150 行
-├── laws.yaml              ✅ 已有
-├── config.yaml            ✨ 新增：通用配置
-├── modules/               ✨ 新增：模块目录
-│   ├── entry_validator.md
-│   ├── path_guardian.md
-│   ├── guidelines_checker.md
-│   └── doc_aligner.md
-├── rules/                 ✨ 新增：规则目录
-│   ├── iron_laws.yaml
-│   └── validation_flow.yaml
-└── tools/
-    ├── validate.js        ✅ 已有
-    └── dashboard-generator.js  ✨ 新增
+├── SKILL.md               ✅ 精简到约 100 行（原 464 行）
+├── laws.yaml.example      ✅ 铁律配置示例
+├── modules/               ✅ 模块目录
+│   ├── README.md          ✅ 模块索引（精简）
+│   ├── entry-file-handler.md  ✅ 入口处理模块（精简到约 90 行）
+│   └── workflow-generator-module.md  ✅ 工作流生成模块
+├── QUICK_REFERENCE.md     ✅ 快速参考（重写）
+└── bootstrap-entry.js     ✅ 自举脚本（bug 修复）
 ```
 
 ---
@@ -610,13 +602,13 @@ code .lingma/workflow/project_guidelines.md
 
 - `laws.yaml.example` - 铁律配置模板
 - `validate.js.template` - 验证脚本模板
-- `ANALYSIS_AND_OPTIMIZATION.md` - 完整分析报告
+- `bootstrap-entry.js` - 入口自举脚本
 
 ### 相关文档
 
 - `.lingma/LINGMA.md` - 工作流入口文件
 - `.lingma/workflow/project_guidelines.md` - 协作规范
-- `.lingma/skills/lingma-workflow/SKILL.md` - 技能主文件
+- `skills/lingma-workflow/SKILL.md` - 技能主文件
 
 ### 工具链接
 
@@ -691,4 +683,4 @@ node .lingma/skills/lingma-workflow/validate.js
 
 ---
 
-*本指南由 lingma-workflow 技能辅助生成，符合项目标准化工作流规范*
+*本指南最后更新于 2026-03-30 (v2.2)*

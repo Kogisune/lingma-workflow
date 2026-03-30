@@ -159,7 +159,6 @@ ${this.generateProjectDescription()}
 ### 技能配置
 - **主技能**: \`lingma-workflow\`
 - **配置文件**: \`.lingma/skills/lingma-workflow/laws.yaml\`
-- **验证脚本**: \`.lingma/skills/lingma-workflow/validate.js\`
 
 ## 4. Quick Commands
 
@@ -168,20 +167,8 @@ ${this.generateProjectDescription()}
 # 启动工作流
 /lingma-workflow
 
-# 查看状态
-/lingma-workflow --status
-
-# 健康检查
-/lingma-workflow --health
-
 # 重新生成入口文件
 node .lingma/skills/lingma-workflow/bootstrap-entry.js
-\`\`\`
-
-### Git Hooks
-\`\`\`bash
-# 安装预提交钩子
-node .lingma/skills/lingma-workflow/setup-git-hooks.js
 \`\`\`
 
 ## 5. Team Info
@@ -216,8 +203,7 @@ node .lingma/skills/lingma-workflow/setup-git-hooks.js
 - v1.0 (${date}) - 初始版本，基础入口文件
 
 ### 相关链接
-- [Lingma 文档](https://lingma.dev/docs)
-- [工作流指南](.lingma/workflow/IMPLEMENTATION_GUIDE.md)
+- [.lingma/workflow/](.lingma/workflow/) - 工作流文档目录
 
 ---
 
@@ -253,22 +239,22 @@ node .lingma/skills/lingma-workflow/setup-git-hooks.js
     const hasComponents = fs.existsSync(path.join(this.projectRoot, 'src/components'));
     const hasViews = fs.existsSync(path.join(this.projectRoot, 'src/views'));
     
-    let description = '这是一个基于现代技术栈的前端项目。\\n\\n';
-    
+    let description = '这是一个基于现代技术栈的前端项目。\n\n';
+
     if (hasSrc) {
-      description += '**主要特点**:\\n';
-      description += '- 使用组件化开发模式\\n';
-      
+      description += '**主要特点**:\n';
+      description += '- 使用组件化开发模式\n';
+
       if (hasComponents) {
-        description += '- 包含丰富的可复用组件\\n';
+        description += '- 包含丰富的可复用组件\n';
       }
-      
+
       if (hasViews) {
-        description += '- 多视图架构支持\\n';
+        description += '- 多视图架构支持\n';
       }
     }
-    
-    description += '\\n项目采用 Lingma 工作流进行标准化管理。';
+
+    description += '\n项目采用 Lingma 工作流进行标准化管理。';
     return description;
   }
   

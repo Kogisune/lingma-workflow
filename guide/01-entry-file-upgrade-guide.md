@@ -1,8 +1,8 @@
 # 入口文件处理机制升级指南
 
-**版本**: 2.0  
-**更新日期**: 2026-03-18  
-**变更类型**: 从严格模式升级到智能自举模式
+**版本**: 2.2  
+**更新日期**: 2026-03-30
+**变更类型**: v2.2 优化 — 文档精简与 bug 修复
 
 ---
 
@@ -62,29 +62,7 @@ ELSE
 | `LINGMA.md` (根目录) | 0.7 | 历史遗留项目 |
 | `.lingma/workflow/index.md` | 0.6 | 索引式入口 |
 
-**识别逻辑**:
-```javascript
-// 伪代码
-function scanAlternatives() {
-  const candidates = [
-    { path: '.lingma/workflow/README.md', confidence: 0.8 },
-    { path: 'LINGMA.md', confidence: 0.7 },
-    { path: '.lingma/workflow/index.md', confidence: 0.6 }
-  ];
-  
-  for (const candidate of candidates) {
-    if (fileExists(candidate.path)) {
-      const content = readFile(candidate.path);
-      
-      if (hasKeywords(content) && content.length > 100) {
-        found.push({ ...candidate, quality: 'good' });
-      }
-    }
-  }
-  
-  return found;
-}
-```
+**识别逻辑**: 检查候选路径是否存在，内容是否包含关键词（"工作流"、"workflow"、"Lingma"）且字符数超过最小阈值（100 或 50），符合条件则加入发现列表并标记质量。
 
 ---
 
@@ -162,9 +140,8 @@ graph TD
 
 ### Step 4: 更新 laws.yaml
 
-待实施 ⏳
-
-需要修改的内容见附录 A。
+已完成 ✅ (v2.2)
+- 更新配置示例与实际文件对齐
 
 ---
 
@@ -197,73 +174,20 @@ graph TD
 
 ### 核心组件
 
-1. **EntryDetector** - 入口检测器
-   ```javascript
-   class EntryDetector {
-     detect() {
-       // 检测标准入口
-       if (this.exists('.lingma/LINGMA.md')) {
-         return { type: 'standard', path: '.lingma/LINGMA.md' };
-       }
-       
-       // 扫描替代入口
-       const alternatives = this.scanAlternatives();
-       if (alternatives.length > 0) {
-         return { type: 'alternative', entries: alternatives };
-       }
-       
-       return { type: 'missing' };
-     }
-   }
-   ```
-
-2. **BootstrapWizard** - 自举向导
-   ```javascript
-   class BootstrapWizard {
-     async guide() {
-       // 交互式引导
-       const choice = await this.askUser();
-       
-       switch(choice) {
-         case 'use_alternative':
-           return this.useAlternative();
-         case 'create_new':
-           return this.createNew();
-         case 'manual':
-           return this.manualSpecify();
-       }
-     }
-   }
-   ```
-
-3. **TemplateGenerator** - 模板生成器
-   ```javascript
-   class TemplateGenerator {
-     generate(type) {
-       switch(type) {
-         case 'basic':
-           return this.basicTemplate();
-         case 'complete':
-           return this.completeTemplate();
-         case 'smart':
-           return this.smartTemplate();
-       }
-     }
-   }
-   ```
+1. **EntryDetector** - 入口检测器：优先检查标准入口 `.lingma/LINGMA.md`，不存在则扫描替代入口列表，返回检测结果类型（standard / alternative / missing）。
+2. **BootstrapWizard** - 自举向导：交互式引导用户选择使用替代入口、创建新入口或手动指定路径。
+3. **TemplateGenerator** - 模板生成器：根据用户选择（basic / complete / smart）加载对应模板并生成入口文件。
 
 ---
 
 ## 📚 相关文件
 
-### 已更新
-- ✅ `SKILL.md` - 铁律 1 逻辑重写
-- ✅ `README.md` - 使用说明更新
-- ✅ `bootstrap-entry.js` - 自举脚本
-
-### 待更新
-- ⏳ `laws.yaml.example` - 配置示例
-- ⏳ `validate.js.template` - 验证脚本适配
+### 已更新（v2.2）
+- `SKILL.md` - 铁律 1 逻辑重写，文档精简（464 → ~100 行）
+- `README.md` - 使用说明更新，移除冗余内容
+- `bootstrap-entry.js` - 自举脚本，修复 `\\n` 字面量和虚假命令引用
+- `modules/entry-file-handler.md` - 精简冗余伪代码（651 → ~90 行）
+- `QUICK_REFERENCE.md` - 重写，移除不存在的 CLI 引用
 
 ---
 
@@ -310,15 +234,16 @@ node bootstrap-entry.js --auto
 - 自动创建
 - 模板系统
 
-### Phase 2: 增强体验（进行中）🔧
+### Phase 2: 文档精简优化（已完成）✅ (v2.2)
+- SKILL.md 精简 78%
+- entry-file-handler.md 精简 86%
+- QUICK_REFERENCE.md 重写
+- bootstrap-entry.js bug 修复
+
+### Phase 3: 增强体验（规划中）⏳
 - Git Hook 集成
 - CI/CD 自动化
 - VSCode 插件
-
-### Phase 3: 生态建设（规划中）⏳
-- 社区模板库
-- 智能推荐引擎
-- 多项目支持
 
 ---
 
@@ -328,7 +253,6 @@ node bootstrap-entry.js --auto
 
 **A**: 确保安装了必要的依赖：
 ```bash
-npm install js-yaml  # 如果需要解析 YAML
 node bootstrap-entry.js
 ```
 
@@ -336,8 +260,8 @@ node bootstrap-entry.js
 
 **A**: 选择合适的模板：
 ```bash
-# 手动指定模板类型
-node bootstrap-entry.js --template=complete
+# 运行自举脚本，交互式选择模板
+node bootstrap-entry.js
 ```
 
 ---
@@ -385,4 +309,4 @@ iron_laws:
 
 ---
 
-*本指南由 lingma-workflow 技能辅助生成，符合项目标准化工作流规范*
+*本指南最后更新于 2026-03-30 (v2.2)*

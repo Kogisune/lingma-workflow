@@ -185,7 +185,7 @@ Week 3-4: 阅读 [文档生成器指南](06-document-generator-guide.md)
 
 ### 工具脚本
 
-- **[validate.js](../skills/lingma-workflow/validate.js)** - 验证脚本
+- **[validate.js.template](../skills/lingma-workflow/validate.js.template)** - 验证脚本模板
 - **[bootstrap-entry.js](../skills/lingma-workflow/bootstrap-entry.js)** - 自举脚本
 
 ---
@@ -194,10 +194,11 @@ Week 3-4: 阅读 [文档生成器指南](06-document-generator-guide.md)
 
 | 指南 | 版本 | 难度 | 预计时间 | 状态 |
 |------|------|------|----------|------|
-| [实施指南](02-implementation-guide.md) | 2.1 | 初级 | 5 分钟 - 4 周 | ✅ 最新 |
-| [入口文件升级指南](01-entry-file-upgrade-guide.md) | 2.0 | 中级 | 30 分钟 | ✅ 稳定 |
-| [模块化重构指南](05-modular-refactoring-guide.md) | 2.1 | 中级 | 2 周 | ✅ 最新 |
-| [文档生成器指南](06-document-generator-guide.md) | 1.0 | 高级 | 2-3 周 | ✅ 新增 |
+| [实施指南](02-implementation-guide.md) | 2.2 | 初级 | 5 分钟 - 4 周 | 最新 |
+| [入口文件升级指南](01-entry-file-upgrade-guide.md) | 2.2 | 中级 | 30 分钟 | 最新 |
+| [模块化重构指南](05-modular-refactoring-guide.md) | 2.2 | 中级 | 2 周 | 最新 |
+| [文档生成器指南](06-document-generator-guide.md) | 2.2 | 高级 | 2-3 周 | 最新 |
+| [模板开发指南](10-template-development-guide.md) | 2.2 | 高级 | 1-2 周 | 最新 |
 
 ### 改进现有指南
 
@@ -297,4 +298,4 @@ Week 3-4: 阅读 [文档生成器指南](06-document-generator-guide.md)
 
 ---
 
-*最后更新：2026-03-19*
+*最后更新：2026-03-30*
